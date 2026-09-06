@@ -144,10 +144,59 @@ void Particle_8::GunMuzzelFlash_53E970(Sprite* a2)
     NOT_IMPLEMENTED;
 }
 
-STUB_FUNC(0x53f060)
-void Particle_8::EmitWaterSplash_53F060(Fix16 xpos, Fix16 ypos, Fix16 zpos, Ang16 rotation, char_type a5)
+// Something wrong with the velocities https://decomp.me/scratch/2Kz9I
+WIP_FUNC(0x53f060)
+void Particle_8::EmitWaterSplash_53F060(Fix16 xpos, Fix16 ypos, Fix16 zpos, Ang16 rotation, char_type bRandomRot)
 {
-    NOT_IMPLEMENTED;
+    WIP_IMPLEMENTED;
+    Ang16 angle_1;
+    Ang16 angle_2;
+    Fix16_Point velocity(Fix16(0), Fix16(0));
+
+    if (!bSkip_particles_67D64D)
+    {
+        velocity.x = Fix16(0);
+        velocity.y = Fix16(stru_6F6784.get_int_4F7AE0(50) + 25) * dword_6FD548;
+        velocity.RotateByAngle_40F6B0(rotation);
+
+        for (u8 i = 0; i < 6; i++)
+        {
+            if (bRandomRot)
+            {
+                angle_2 = word_6FD5CC.sub_401CB0(Fix16(stru_6F6784.get_int_4F7AE0(360)));
+            }
+            else
+            {
+                angle_2 = rotation;
+            }
+
+            velocity.x = Fix16(0);
+            velocity.y = (Fix16(stru_6F6784.get_int_4F7AE0(100)) + dword_6FD558) * dword_6FD4EC;
+
+            velocity.RotateByAngle_40F6B0((word_6FD5CC.sub_401CB0(Fix16(stru_6F6784.get_int_4F7AE0(16))) + rotation) -
+                                          word_6FD5CC.sub_401CB0(Fix16(8)));
+
+            Fix16 x_dir = velocity.x / 15;
+            Fix16 y_dir = velocity.y / 15;
+
+            Particle_4C* pWaterSplashParticle = gParticle_8_6FD5E8->New_53E3C0(velocity.x, velocity.y, dword_6FD330, -x_dir, -y_dir, 0);
+
+            if (pWaterSplashParticle)
+            {
+                pWaterSplashParticle->field_34 = 0;
+                pWaterSplashParticle->field_38_state = 35;
+                pWaterSplashParticle->field_2C_counter = 15;
+                pWaterSplashParticle->field_2E = 15;
+
+                pWaterSplashParticle->field_30_pNext->SetType_4206F0(8);
+                pWaterSplashParticle->field_30_pNext->set_id_lazy_4206C0(gPhi_8CA8_6FCF00->field_8CA4 + 132);
+                pWaterSplashParticle->field_46_sub_state = 0;
+                pWaterSplashParticle->field_48_timer = 6;
+                pWaterSplashParticle->field_30_pNext->set_xyz_lazy_420600(xpos, ypos, zpos);
+                gPurpleDoom_3_679210->AddToSingleBucket_477AE0(pWaterSplashParticle->field_30_pNext);
+            }
+        }
+    }
 }
 
 MATCH_FUNC(0x5405D0)
