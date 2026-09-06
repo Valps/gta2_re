@@ -388,10 +388,73 @@ void Weapon_30::pistol_5DD860()
     }
 }
 
-STUB_FUNC(0x5dda70)
+// It matches on decompme: https://decomp.me/scratch/dAQ5C
+WIP_FUNC(0x5dda70)
 void Weapon_30::dual_pistol_5DDA70()
 {
-    NOT_IMPLEMENTED;
+    Ang16 ped_rotation;
+    Fix16_Point vector;
+    Fix16_Point vector2;
+    Fix16_Point vector3;
+    Fix16_Point vector_esp1; // not used, but required to match
+    Fix16_Point vector_esp2; // not used, but required to match
+
+    if (field_2_reload_speed == 0)
+    {
+        vector = field_24_pPed->sub_45B520();
+
+        Fix16 x = field_24_pPed->get_cam_x();
+        Fix16 y = field_24_pPed->get_cam_y();
+        Fix16 z = field_24_pPed->get_cam_z();
+        ped_rotation = field_24_pPed->GetRotation();
+        vector3 = field_24_pPed->sub_45B520(); // vector isnt used, but required to match
+
+        vector2.FromPolar_41E210(dword_706CF4, ped_rotation);
+        Fix16 point_x = x + vector2.x;
+        Fix16 point_y = y + vector2.y;
+
+        set_field_2C_4CCA80(1);
+        if (!field_4)
+        {
+            s32 weapon_bullet_model;
+            if (field_24_pPed->IsField238_45EDE0(2))
+            {
+                weapon_bullet_model = objects::pistol_bullet_265;
+            }
+            else
+            {
+                weapon_bullet_model = objects::machine_gun_bullet_254;
+            }
+
+            Object_2C* pBullet_1 =
+                Weapon_30::spawn_bullet_5DCF60(weapon_bullet_model, point_x, point_y, z, ped_rotation - word_706D5E, vector);
+            Object_2C* pBullet_2 =
+                Weapon_30::spawn_bullet_5DCF60(weapon_bullet_model, point_x, point_y, z, ped_rotation + word_706D5E, vector);
+            if ((pBullet_1 || pBullet_2) && field_24_pPed->IsField238_45EDE0(2))
+            {
+                decrement_ammo_4CCA30();
+            }
+            field_2_reload_speed = 10;
+            field_24_pPed->AddThreateningPedToList_46FC70();
+            gParticle_8_6FD5E8->GunMuzzelFlash_53E970(field_24_pPed->field_168_game_object->field_80_sprite_ptr);
+
+            if (field_24_pPed->is_player_41B0A0())
+            {
+                gShooey_CC_67A4B8->ReportCrimeForPed(2, field_24_pPed);
+            }
+        }
+        else
+        {
+            Weapon_30::spawn_bullet_5DCF60(objects::flamethrower_fire_154, point_x, point_y, z, ped_rotation - word_706D5E, vector);
+            Weapon_30::spawn_bullet_5DCF60(objects::flamethrower_fire_154, point_y, point_y, z, ped_rotation + word_706D5E, vector);
+            field_2_reload_speed = 5;
+        }
+        Weapon_30::TickReloadSpeed_5DCF40();
+    }
+    else
+    {
+        field_2_reload_speed--;
+    }
 }
 
 // https://decomp.me/scratch/lAo1H
