@@ -271,6 +271,7 @@ class Fix16
         return Fix16(mValue & 0xFFFFC000, 0); // 0xFFFFC000 = 0xFFFFFFFF - Fix16(1)
     }
 
+    // 9.6f func: 0x42A630
     inline Fix16 GetFracValue() const
     {
         // get the "fractional part" of Fix16

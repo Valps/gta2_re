@@ -625,6 +625,16 @@ class Map_0x370
         return false;
     }
 
+    inline bool IsBlockNonAirType_48A350(u8 x, u8 y, u8 z)
+    {
+        gmp_block_info* pBlock = get_block_452980(x, y, z);
+        if (pBlock)
+        {
+            return (pBlock->field_B_slope_type & 3) != AIR;
+        }
+        return false;
+    }
+
   public:
     gmp_compressed_map_32* field_0_pDmap;
     Map_sub field_4_obj;
