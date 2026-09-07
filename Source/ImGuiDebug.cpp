@@ -1261,51 +1261,6 @@ void CC ImGuiDebugDraw()
             {
                 gGame_0x40_67E008->field_4_players[0]->field_2D4_scores.GetScoreDigits_592360()->ColorDigits_4921F0(palette_types_enum::sprites_2, 0);
             }
-
-            if (ImGui::Button("Particle test"))
-            {
-
-                Fix16 xOff;
-                xOff.FromInt(1);
-
-                // From player when stood idle
-                gParticle_8_6FD5E8->SpawnCigaretteSmokePuff_5406B0(pPlayerSprite, 1);
-                gParticle_8_6FD5E8->SpawnCigaretteSmokePuff_5406B0(pPlayerSprite, 0);
-
-                // Not sure what this does, no visible effect?
-                //gParticle_8_6FD5E8->SpawnParticleSprite_5405D0(pPlayerSprite);
-
-                // Drowing peds/cars in water etc
-                gParticle_8_6FD5E8->EmitWaterSplash_53F060(pPlayerSprite->field_14_xy.x,
-                                                           pPlayerSprite->field_14_xy.y,
-                                                           pPlayerSprite->field_1C_zpos,
-                                                           0,
-                                                           0);
-
-                gParticle_8_6FD5E8->GunMuzzelFlash_53E970(pPlayerSprite);
-
-                // Not sure where this is used in game ??
-                gParticle_8_6FD5E8->EmitElectricArcParticle(pPlayerSprite->field_14_xy.x,
-                                                            pPlayerSprite->field_14_xy.y,
-                                                            pPlayerSprite->field_1C_zpos,
-                                                            0);
-
-                gParticle_8_6FD5E8->EmitFireTruckSprayParticle_53FAE0(pPlayerSprite);
-                gParticle_8_6FD5E8->EmitFlameStreamSegment_53F4C0(pPlayerSprite);
-
-                // When being shot etc
-                gParticle_8_6FD5E8->EmitBloodBurst_53E450(pPlayerSprite->field_14_xy.x,
-                                                          pPlayerSprite->field_14_xy.y,
-                                                          pPlayerSprite->field_1C_zpos,
-                                                          0);
-
-                // Like when a car crashes
-                gParticle_8_6FD5E8->EmitImpactParticles_53FE40(pPlayerSprite->field_14_xy.x,
-                                                               pPlayerSprite->field_14_xy.y,
-                                                               pPlayerSprite->field_1C_zpos,
-                                                               0,
-                                                               0);
-            }
         }
         else
         {
@@ -1626,6 +1581,14 @@ void CC ImGuiDebugDraw()
                     pNewCar = gCar_6C_677930->SpawnCarAt_446230(xpos + xOff, ypos, zpos, 0, currentCarModelIndex, scale);
 
                     pNewCar->IncrementCarStats_443D70(car_kind::recycled_1); // avoid crashes when entering the car
+
+                    s8 zone_idx = gGangPool_CA8_67E274->FindGangByCarModel_4BF2F0(pNewCar->field_84_car_info_idx);
+                    if (zone_idx > -1)
+                    {
+                        Gang_144* pGang = gGangPool_CA8_67E274->GangByIdx_4BF1C0(zone_idx);
+                        pNewCar->AttachGangIcon_440660(pGang->field_138_arrow_colour);
+                        pNewCar->SetCarRemap(pGang->field_140_gang_car_remap);
+                    }
                 }
                 if (ImGui::Button("Spawn car with trailer"))
                 {
@@ -2880,6 +2843,103 @@ void CC ImGuiDebugDraw()
             else
             {
                 ClearGlobalArrow();
+            }
+            ImGui::TreePop();
+        }
+        
+        if (gParticle_8_6FD5E8 && ImGui::TreeNode("Particle_8"))
+        {
+            pPlayerSprite = GetPlayerSprite();
+
+            static Fix16_Point particle_velocity = Fix16_Point(Fix16(0), Fix16(0));
+            static Fix16 speed = Fix16(0);
+            static Fix16 unknown = Fix16(0);
+            static s32 mVar_speed = 0;
+            static s32 mVar_unknown = 0;
+            static s32 particle_type = 1;
+
+            static s32 counter = 100;
+            static s32 timer = 0;
+            static s32 f_34 = 0;
+            static s32 f_2E = 0;
+            
+            ImGui::InputInt("Type (1 - 44)", &particle_type, 1, 1);
+
+            ImGui::SliderInt("Speed", &mVar_speed, 0, 0x4000 * 5);
+            speed = Fix16(mVar_speed, 0);
+
+            ImGui::SliderInt("Unknown", &mVar_unknown, 0, 0x4000 * 5);
+            unknown = Fix16(mVar_unknown, 0);
+
+            ImGui::SliderInt("Counter", &counter, 0, 600);
+            ImGui::SliderInt("Timer", &timer, 0, 10);
+            ImGui::SliderInt("F_34", &f_34, 0, 1);
+            ImGui::SliderInt("F_2E", &f_2E, 0, 1000);
+
+            if (ImGui::Button("Create Particle"))
+            {
+                particle_velocity.FromPolar_41E210(speed, pPlayerSprite->field_0);
+                Particle_4C* pParticle = gParticle_8_6FD5E8->New_53E3C0(particle_velocity.x, particle_velocity.y, unknown, 0, 0, 0);
+
+                if (pParticle)
+                {
+                    pParticle->field_34 = f_34;
+                    pParticle->field_38_state = particle_type;
+                    pParticle->field_2C_counter = counter;
+                    pParticle->field_2E = f_2E;
+
+                    pParticle->field_30_pNext->SetType_4206F0(8);
+                    pParticle->field_30_pNext->set_id_lazy_4206C0(gPhi_8CA8_6FCF00->field_8CA4 + 132);
+                    pParticle->field_46_sub_state = 0; // TODO
+                    pParticle->field_48_timer = timer;
+                    pParticle->field_30_pNext->set_xyz_lazy_420600(pPlayerSprite->field_14_xy.x, pPlayerSprite->field_14_xy.y, pPlayerSprite->field_1C_zpos);
+                    gPurpleDoom_3_679210->AddToSingleBucket_477AE0(pParticle->field_30_pNext);
+                }
+            }
+            
+
+            if (ImGui::Button("Many Particles test"))
+            {
+                Fix16 xOff;
+                xOff.FromInt(1);
+
+                // From player when stood idle
+                gParticle_8_6FD5E8->SpawnCigaretteSmokePuff_5406B0(pPlayerSprite, 1);
+                gParticle_8_6FD5E8->SpawnCigaretteSmokePuff_5406B0(pPlayerSprite, 0);
+
+                // Not sure what this does, no visible effect?
+                //gParticle_8_6FD5E8->SpawnParticleSprite_5405D0(pPlayerSprite);
+
+                // Drowing peds/cars in water etc
+                gParticle_8_6FD5E8->EmitWaterSplash_53F060(pPlayerSprite->field_14_xy.x,
+                                                           pPlayerSprite->field_14_xy.y,
+                                                           pPlayerSprite->field_1C_zpos,
+                                                           0,
+                                                           0);
+
+                gParticle_8_6FD5E8->GunMuzzelFlash_53E970(pPlayerSprite);
+
+                // Not sure where this is used in game ??
+                gParticle_8_6FD5E8->EmitElectricArcParticle(pPlayerSprite->field_14_xy.x,
+                                                            pPlayerSprite->field_14_xy.y,
+                                                            pPlayerSprite->field_1C_zpos,
+                                                            0);
+
+                gParticle_8_6FD5E8->EmitFireTruckSprayParticle_53FAE0(pPlayerSprite);
+                gParticle_8_6FD5E8->EmitFlameStreamSegment_53F4C0(pPlayerSprite);
+
+                // When being shot etc
+                gParticle_8_6FD5E8->EmitBloodBurst_53E450(pPlayerSprite->field_14_xy.x,
+                                                          pPlayerSprite->field_14_xy.y,
+                                                          pPlayerSprite->field_1C_zpos,
+                                                          0);
+
+                // Like when a car crashes
+                gParticle_8_6FD5E8->EmitImpactParticles_53FE40(pPlayerSprite->field_14_xy.x,
+                                                               pPlayerSprite->field_14_xy.y,
+                                                               pPlayerSprite->field_1C_zpos,
+                                                               0,
+                                                               0);
             }
             ImGui::TreePop();
         }
