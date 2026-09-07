@@ -1,7 +1,11 @@
 #include "Particle_4C.hpp"
+#include "map_0x370.hpp"
+#include "Object_5C.hpp"
 #include "Phi_8CA8.hpp"
 #include "PurpleDoom.hpp"
+#include "rng.hpp"
 #include "sprite.hpp"
+#include "Wolfy_3D4.hpp"
 
 EXTERN_GLOBAL(Fix16, dword_6FD49C);
 EXTERN_GLOBAL(Fix16, dword_6FD2F0);
@@ -24,17 +28,124 @@ DEFINE_GLOBAL_INIT(Fix16, dword_6FD45C, Fix16(0xA3, 0), 0x6FD45C);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD564, Fix16(0x51, 0), 0x6FD564);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD538, Fix16(0x31, 0), 0x6FD538);
 
-STUB_FUNC(0x538060)
+DEFINE_GLOBAL_INIT(Fix16, dword_6FD55C, Fix16(0x3000, 0), 0x6FD55C);
+DEFINE_GLOBAL_INIT(Fix16, dword_6FD30C, Fix16(0x3999, 0), 0x6FD30C);
+DEFINE_GLOBAL_INIT(Fix16, dword_6FD280, Fix16(255), 0x6FD280);
+
+// https://decomp.me/scratch/nKSYL
+WIP_FUNC(0x538060)
 char_type Particle_4C::UpdateFloatingParticle_state_6_15_16_17_538060()
 {
-    NOT_IMPLEMENTED;
-    return 0;
+    WIP_IMPLEMENTED;
+    Fix16 rng_1;
+    Fix16 rng_2;
+    Fix16_Point vector(Fix16(0), Fix16(0));
+    Fix16 new_z = dword_6FD45C + field_30_pNext->field_1C_zpos;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
+    if (new_z > dword_6FD28C)
+    {
+        return true;
+    }
+
+    if (new_z.GetFracValue() > dword_6FD55C &&
+        gMap_0x370_6F6268->IsBlockNonAirType_48A350(field_30_pNext->field_14_xy.x.ToInt(),
+                                                    field_30_pNext->field_14_xy.y.ToInt(),
+                                                    new_z.ToInt()))
+    {
+        rng_1 = Fix16(stru_6F6784.get_int_4F7AE0(61) - 30) / 100;
+        rng_2 = Fix16(stru_6F6784.get_int_4F7AE0(10) - 5) / 100;
+        ++field_2C_counter;
+    }
+    else
+    {
+        rng_1 = Fix16(stru_6F6784.get_int_4F7AE0(3) - 1) / 100;
+        rng_2 = Fix16(stru_6F6784.get_int_4F7AE0(3) - 1) / 100;
+    }
+
+    if (field_40_pUnknown)
+    {
+        if (field_2C_counter > 60)
+        {
+            field_40_pUnknown->field_14;
+            if (field_40_pUnknown->field_14->field_4)
+            {
+                field_20 = field_40_pUnknown->field_14->field_4->field_8_object_2C_ptr->sub_5290F0();
+                field_24_angle = field_40_pUnknown->field_14->field_4->field_8_object_2C_ptr->field_10_obj_3c->field_4_angle;
+            }
+            if (field_40_pUnknown->field_1A == 1)
+            {
+                field_40_pUnknown = NULL;
+            }
+        }
+    }
+    else
+    {
+        field_20 = dword_6FD49C;
+    }
+
+    if (field_20 == dword_6FD49C)
+    {
+        stru_6FD388 = field_30_pNext->field_14_xy.x + rng_1;
+        stru_6FD38C = field_30_pNext->field_14_xy.y + rng_2;
+        if (stru_6FD388 > dword_6FD4A0 && stru_6FD388 < dword_6FD280 - dword_6FD4A0 && stru_6FD38C > dword_6FD4A0 &&
+            stru_6FD38C < dword_6FD280 - dword_6FD4A0)
+        {
+            field_30_pNext->set_xyz_lazy_420600(stru_6FD388, stru_6FD38C, new_z);
+        }
+        else
+        {
+            field_30_pNext->set_xyz_lazy_420600(field_30_pNext->field_14_xy.x, field_30_pNext->field_14_xy.y, new_z);
+        }
+    }
+    else
+    {
+        field_20 = field_20 * dword_6FD30C;
+        if (field_20 < dword_6FD49C)
+        {
+            field_20 = dword_6FD49C;
+        }
+        vector.x = field_20;
+        vector.y = dword_6FD49C;
+        vector.RotateByAngle_40F6B0(field_24_angle);
+
+        field_14_additional_speed_x = vector.x;
+        field_18_additional_speed_y = vector.y;
+
+        field_8_speed_x = field_14_additional_speed_x + rng_1;
+        field_C_speed_y = field_18_additional_speed_y + rng_2;
+
+        stru_6FD388 = field_30_pNext->field_14_xy.x + rng_1;
+        stru_6FD38C = field_30_pNext->field_14_xy.y + rng_2;
+        if (stru_6FD388 > dword_6FD4A0 && stru_6FD388 < dword_6FD280 - dword_6FD4A0 && stru_6FD38C > dword_6FD4A0 &&
+            stru_6FD38C < dword_6FD280 - dword_6FD4A0)
+        {
+            field_30_pNext->set_xyz_lazy_420600(stru_6FD388, stru_6FD38C, new_z);
+        }
+        else
+        {
+            field_30_pNext->set_xyz_lazy_420600(field_30_pNext->field_14_xy.x, field_30_pNext->field_14_xy.y, new_z);
+        }
+    }
+
+    gPurpleDoom_3_679210->AddToSingleBucket_477AE0(field_30_pNext);
+    return false;
 }
 
 STUB_FUNC(0x5384c0)
 char_type Particle_4C::UpdateDirectedProjectile_state_3_12_5384C0()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -61,6 +172,14 @@ STUB_FUNC(0x538ac0)
 char_type Particle_4C::UpdateObjectBeamLink_state_38_538AC0()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 6)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -68,6 +187,18 @@ STUB_FUNC(0x539040)
 char_type Particle_4C::UpdateDirectedBurstSweep_state_4_539040()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 16)
+    {
+        return true;
+    }
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -75,6 +206,18 @@ STUB_FUNC(0x539480)
 char_type Particle_4C::UpdateDirectedBurst_state_13_14_36_539480()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 16)
+    {
+        return true;
+    }
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -83,6 +226,13 @@ STUB_FUNC(0x539890)
 char_type Particle_4C::UpdateCircularBurst_state_5_539890()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -189,6 +339,14 @@ STUB_FUNC(0x53ae60)
 char_type Particle_4C::UpdateLargeBallisticDebris_state_35_53AE60()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 15)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -291,6 +449,13 @@ STUB_FUNC(0x53b670)
 char_type Particle_4C::UpdateAttachedEmitter_state_9_10_53B670()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -346,6 +511,13 @@ STUB_FUNC(0x53bac0)
 char_type Particle_4C::UpdateCollisionBurst_state_31_34_53BAC0()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
