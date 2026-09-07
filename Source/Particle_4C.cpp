@@ -139,6 +139,13 @@ STUB_FUNC(0x5384c0)
 char_type Particle_4C::UpdateDirectedProjectile_state_3_12_5384C0()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -165,6 +172,14 @@ STUB_FUNC(0x538ac0)
 char_type Particle_4C::UpdateObjectBeamLink_state_38_538AC0()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 6)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -172,6 +187,18 @@ STUB_FUNC(0x539040)
 char_type Particle_4C::UpdateDirectedBurstSweep_state_4_539040()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 16)
+    {
+        return true;
+    }
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -179,6 +206,18 @@ STUB_FUNC(0x539480)
 char_type Particle_4C::UpdateDirectedBurst_state_13_14_36_539480()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 16)
+    {
+        return true;
+    }
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -187,6 +226,13 @@ STUB_FUNC(0x539890)
 char_type Particle_4C::UpdateCircularBurst_state_5_539890()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -293,6 +339,14 @@ STUB_FUNC(0x53ae60)
 char_type Particle_4C::UpdateLargeBallisticDebris_state_35_53AE60()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    ++field_46_sub_state;
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_46_sub_state == 15)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -395,6 +449,13 @@ STUB_FUNC(0x53b670)
 char_type Particle_4C::UpdateAttachedEmitter_state_9_10_53B670()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
@@ -450,6 +511,13 @@ STUB_FUNC(0x53bac0)
 char_type Particle_4C::UpdateCollisionBurst_state_31_34_53BAC0()
 {
     NOT_IMPLEMENTED;
+
+    // provisional code
+    gPurpleDoom_3_679210->Remove_477B00(field_30_pNext);
+    if (field_2C_counter == 0)
+    {
+        return true;
+    }
     return 0;
 }
 
