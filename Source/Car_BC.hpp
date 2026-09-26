@@ -940,6 +940,12 @@ class Car_BC
         return !sub_421620() && !inline_check_0x10_info_421640() && !IsTrainModel_403BA0() && !sub_447ED0();
     }
 
+    void sub_426E00()
+    {
+        field_9C_engine_status = 3;
+        sub_43BFE0();
+    }
+
     inline Ang16 get_car_rotation_416BB0()
     {
         return field_50_car_sprite->field_0;

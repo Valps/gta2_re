@@ -10,6 +10,8 @@
 #include "CarAI_78.hpp"
 #include "CarPhysics_B0.hpp"
 #include "Object_5C.hpp"
+#include "Player.hpp"
+#include "PurpleDoom.hpp"
 
 DEFINE_GLOBAL(PublicTransport_181C*, gPublicTransport_181C_6FF1D4, 0x6FF1D4);
 DEFINE_GLOBAL(TrainStationList, dword_6FEE68, 0x6FEE68);
@@ -20,6 +22,8 @@ DEFINE_GLOBAL(u8, dword_6FF158, 0x6FF158);
 DEFINE_GLOBAL(u8, byte_6FF1CD, 0x6FF1CD);
 DEFINE_GLOBAL(s32, dword_6FF1D0, 0x6FF1D0);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FF07C, Fix16(1), 0x6FF07C);
+DEFINE_GLOBAL_INIT(Fix16, dword_6FF04C, Fix16(0x333, 0), 0x6FF04C);
+
 Fix16 dword_6FEEE8 = Fix16(0.5); //DEFINE_GLOBAL_INIT(Fix16, dword_6FEEE8, Fix16(0.5), 0x6FEEE8);
 Ang16 word_6FF1BC = Ang16(0); //DEFINE_GLOBAL_INIT(Ang16, word_6FF1BC, Ang16(0), 0x6FF1BC);
 
@@ -1008,16 +1012,260 @@ bool PublicTransport_181C::sub_579B90(Car_BC* pToFind, Fix16* pF16Unk)
     return false;
 }
 
-STUB_FUNC(0x579ca0)
+// https://decomp.me/scratch/5m4jV
+WIP_FUNC(0x579ca0)
 void PublicTransport_181C::BusesService_579CA0()
 {
-    NOT_IMPLEMENTED;
+    WIP_IMPLEMENTED;
+    Car_BC* pBusCar;
+    Fix16 xpos;
+    Fix16 ypos;
+
+    if (!bSkip_buses_67D558)
+    {
+        s32 found_z;
+        if (dword_6FF1D0 || byte_6FF1CD || !gCar_6C_677930->CanAllocateOfType_446930(1))
+        {
+            if (--dword_6FF1D0 < 0)
+            {
+                dword_6FF1D0 = 0;
+            }
+        }
+        else
+        {
+            TrainStation_34* pBusStop = PublicTransport_181C::GetBusStopOnScreen_5799B0();
+            if (pBusStop)
+            {
+                ypos = Fix16(pBusStop->field_10_pZone->field_2_y);
+                xpos = Fix16(pBusStop->field_10_pZone->field_1_x);
+                gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(xpos.ToInt(), ypos.ToInt(), &found_z);
+                s16 v7 = 0;
+                u16 v33 = 0;
+                do
+                {
+                    switch (v7)
+                    {
+                        case 0:
+                            if (gMap_0x370_6F6268->IsNorthBlockRoadType_433470(xpos.ToInt(), ypos.ToInt(), found_z))
+                            {
+                                ypos -= dword_6FEEE8;
+                                v33 = 4;
+                            }
+                            break;
+                        case 1:
+                            if (gMap_0x370_6F6268->IsEastBlockRoadType_4334A0(xpos.ToInt(), ypos.ToInt(), found_z))
+                            {
+                                xpos += dword_6FF07C;
+                                v33 = 4;
+                            }
+                            break;
+                        case 2:
+                            // inlined
+                            if (gMap_0x370_6F6268->IsSouthBlockRoadType_4334D0(xpos.ToInt(), ypos.ToInt(), found_z))
+                            {
+                                ypos += dword_6FF07C;
+                                v33 = 4;
+                            }
+                            break;
+                        case 3:
+                            // inlined
+                            if (gMap_0x370_6F6268->IsWestBlockRoadType_433500(xpos.ToInt(), ypos.ToInt(), found_z))
+                            {
+                                xpos -= dword_6FEEE8;
+                                v33 = 4;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    v7 = ++v33;
+
+                } while (v33 < 4);
+
+                gmp_block_info* HighestBlockForCoord_4E4C30 =
+                    gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(xpos.ToInt(), ypos.ToInt(), &found_z);
+                if (HasBlockGreenArrowAtDirection_577E20(4, HighestBlockForCoord_4E4C30))
+                {
+                    field_17C0_bus.field_C_carriages[0] =
+                        gCar_6C_677930->SpawnBusAtValidRoadPosition_4453E0(xpos, ypos + dword_6FEEE8, 4, car_model_enum::BUS);
+                }
+                if (HasBlockGreenArrowAtDirection_577E20(2, HighestBlockForCoord_4E4C30))
+                {
+                    field_17C0_bus.field_C_carriages[0] =
+                        gCar_6C_677930->SpawnBusAtValidRoadPosition_4453E0(xpos + dword_6FEEE8, ypos, 2, car_model_enum::BUS);
+                }
+                if (HasBlockGreenArrowAtDirection_577E20(3, HighestBlockForCoord_4E4C30))
+                {
+                    field_17C0_bus.field_C_carriages[0] =
+                        gCar_6C_677930->SpawnBusAtValidRoadPosition_4453E0(xpos, ypos, 3, car_model_enum::BUS);
+                }
+                if (HasBlockGreenArrowAtDirection_577E20(1, HighestBlockForCoord_4E4C30))
+                {
+                    field_17C0_bus.field_C_carriages[0] =
+                        gCar_6C_677930->SpawnBusAtValidRoadPosition_4453E0(xpos, ypos, 1, car_model_enum::BUS);
+                }
+                pBusCar = field_17C0_bus.field_C_carriages[0];
+                if (pBusCar)
+                {
+                    // inline here: pBusCar.6f Car_BC::sub_421510
+                    if (!pBusCar->field_5C_AI)
+                    {
+                        pBusCar->field_5C_AI = gCarAI_78_Pool_677CF8->Allocate();
+                    }
+                    field_17C0_bus.field_C_carriages[0]->field_5C_AI->SetCar_453BF0(field_17C0_bus.field_C_carriages[0]);
+                    field_17C0_bus.field_C_carriages[0]->SpawnDriverPed();
+                    field_17C0_bus.field_C_carriages[0]->sub_421560(4);
+                    field_17C0_bus.field_C_carriages[0]->InitCarAIControl_440590();
+                    field_17C0_bus.field_C_carriages[0]->sub_426E00();
+
+                    byte_6FF1CD = 1;
+                    field_17C0_bus.field_48 = 0;
+                    field_17C0_bus.field_56_passenger_count = 0;
+                    field_17C0_bus.field_C_carriages[0]->IncrementCarStats_443D70(1);
+                }
+            }
+            dword_6FF1D0 = 200;
+        }
+
+        pBusCar = field_17C0_bus.field_C_carriages[0];
+        if (pBusCar)
+        {
+            if (!field_17C0_bus.field_0)
+            {
+                if (pBusCar->is_driven_by_player())
+                {
+                    field_17C0_bus.field_0 = 1;
+                    pBusCar->field_54_driver->field_15C_player->field_2D4_scores.sub_593370(pBusCar);
+                }
+                else
+                {
+                    if (pBusCar->field_54_driver)
+                    {
+                        if (pBusCar->field_54_driver->get_occupation_403980() != ped_ocupation_enum::unknown_2 &&
+                            pBusCar->field_54_driver->get_occupation_403980() != ped_ocupation_enum::driver)
+                        {
+                            field_17C0_bus.field_0 = 1;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (!field_17C0_bus.field_C_carriages[0]->is_driven_by_player())
+                {
+                    if (pBusCar->field_54_driver)
+                    {
+                        if (pBusCar->field_54_driver->get_occupation_403980() == ped_ocupation_enum::angry_armed_robbed_driver_12)
+                        {
+                            field_17C0_bus.field_0 = 0;
+                            field_17C0_bus.field_2 = 0;
+                            pBusCar->field_54_driver->set_occupation_403970(ped_ocupation_enum::driver);
+                            field_17C0_bus.field_C_carriages[0]->field_54_driver->SetField238_403920(3);
+                        }
+                    }
+                }
+                if (!field_17C0_bus.field_2 && !field_1818_stop_getting_off_bus)
+                {
+                    if (field_17C0_bus.field_C_carriages[0]->GetCarLinearSpeed_43A240() > dword_6FEED4 + dword_6FF04C)
+                    {
+                        field_17C0_bus.field_2 = 1;
+                        field_17C0_bus.field_C_carriages[0]->field_4_passengers_list.ApplyPassengerBusStopBehavior_471630();
+                    }
+                }
+            }
+
+            if (field_17C0_bus.field_C_carriages[0]->Get_F76_4A9AD0() > 200)
+            {
+                field_17C0_bus.field_C_carriages[0]->sub_421470();
+                field_17C0_bus.field_C_carriages[0] = 0;
+                byte_6FF1CD = 0;
+                dword_6FF1D0 = 100;
+            }
+            else
+            {
+                if (field_17C0_bus.field_C_carriages[0]->IsDespawning_4215B0() ||
+                    field_17C0_bus.field_C_carriages[0]->field_74_damage == 32000)
+                {
+                    field_17C0_bus.field_C_carriages[0] = 0;
+                    byte_6FF1CD = 0;
+                    dword_6FF1D0 = 0;
+                }
+                else
+                {
+                    switch (field_17C0_bus.field_48)
+                    {
+                        case 12:
+                            --field_17C0_bus.field_4;
+                            field_17C0_bus.field_C_carriages[0]->sub_43AF60();
+                            if (!field_17C0_bus.field_4)
+                            {
+                                field_17C0_bus.field_48 = 5;
+                                field_17C0_bus.field_4 = 10;
+                            }
+                            break;
+
+                        case 5:
+                            --field_17C0_bus.field_4;
+                            field_17C0_bus.field_C_carriages[0]->sub_43B380();
+                            if (!field_17C0_bus.field_4)
+                            {
+                                field_17C0_bus.field_4 = 100;
+                                field_17C0_bus.field_48 = 13;
+                            }
+                            break;
+
+                        case 13:
+                            if (!field_17C0_bus.field_2)
+                            {
+                                field_17C0_bus.UpdatePassengerAI_578390();
+                            }
+                            if (!field_17C0_bus.field_0)
+                            {
+                                if (!--field_17C0_bus.field_4)
+                                {
+                                    field_17C0_bus.field_48 = 9;
+                                    field_17C0_bus.field_4 = 10;
+                                }
+                            }
+                            else if (field_17C0_bus.field_C_carriages[0]->GetCarLinearSpeed_43A240() > dword_6FF078)
+                            {
+                                field_17C0_bus.field_48 = 9;
+                                field_17C0_bus.field_4 = 10;
+                            }
+                            break;
+
+                        case 9:
+                            field_17C0_bus.field_C_carriages[0]->sub_43B3D0();
+                            if (!--field_17C0_bus.field_4)
+                            {
+                                field_17C0_bus.field_48 = 14;
+                                field_17C0_bus.field_4 = 10;
+                            }
+                            break;
+
+                        case 14:
+                            field_17C0_bus.field_C_carriages[0]->sub_43AF40();
+                            if (!--field_17C0_bus.field_4)
+                            {
+                                field_17C0_bus.field_48 = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    gPurpleDoom_2_67920C->CheckAndHandleCollisionInStrips_477BD0(field_17C0_bus.field_C_carriages[0]->field_50_car_sprite);
+                }
+            }
+        }
+    }
 }
 
 STUB_FUNC(0x57a7a0)
 void PublicTransport_181C::PublicTransportService_57A7A0()
 {
     NOT_IMPLEMENTED;
+    PublicTransport_181C::BusesService_579CA0();
+    // TODO: the rest
 }
 
 MATCH_FUNC(0x57b4b0)
