@@ -998,7 +998,7 @@ class Car_BC
     char_type field_83;
     s32 field_84_car_info_idx;
     s32 field_88_despawn_status;
-    char_type field_8C;
+    u8 field_8C_damage_level;
     char_type field_8D;
     char_type field_8E;
     char_type field_8F;

@@ -3099,7 +3099,7 @@ MATCH_FUNC(0x43d400)
 void Car_BC::sub_43D400()
 {
     this->field_74_damage = 0;
-    this->field_8C = 0;
+    this->field_8C_damage_level = 0;
 
     this->field_8_damaged_areas.clear_bit(CarDeltaBitsEnum::TopLeftDamage_0);
     this->field_8_damaged_areas.clear_bit(CarDeltaBitsEnum::TopRightDamage_1);
@@ -3315,18 +3315,18 @@ s16 Car_BC::AccumulateDamage_43DA90(s16 damage, Fix16_Point* pVec)
         }
         if (this->field_74_damage >= 16000)
         {
-            if (this->field_8C < 3u)
+            if (this->field_8C_damage_level < 3)
             {
                 Car_BC::SpawnDamageFireEffect_43B870(1, pVec);
-                this->field_8C = 3;
+                this->field_8C_damage_level = 3;
             }
             if (this->field_74_damage >= 25000)
             {
-                if (this->field_8C < 4u)
+                if (this->field_8C_damage_level < 4)
                 {
                     field_0_qq.sub_5A71F0();
                     Car_BC::SpawnDamageFireEffect_43B870(2, pVec);
-                    this->field_8C = 4;
+                    this->field_8C_damage_level = 4;
                 }
                 if (this->field_74_damage >= 31500)
                 {
@@ -5679,7 +5679,7 @@ char_type Car_BC::PoolUpdate()
         {
             if (field_54_driver)
             {
-                if (field_9C_engine_status == car_engine_status::on_3 && !field_4_passengers_list.field_0_pFirstPed && field_8C < 3u)
+                if (field_9C_engine_status == car_engine_status::on_3 && !field_4_passengers_list.field_0_pFirstPed && field_8C_damage_level < 3u)
                 {
                     gTaxi_4_704130->PushTaxi_457BA0(this);
                 }
@@ -6231,7 +6231,7 @@ void Car_BC::PoolAllocate()
 {
     this->field_6C_maybe_id = gCar_6C_677930->field_14++;
     this->field_74_damage = 0;
-    this->field_8C = 0;
+    this->field_8C_damage_level = 0;
     this->field_8_damaged_areas.ClearAllBits_420D90();
     this->field_4_passengers_list.ClearList_420E90();
     this->field_54_driver = 0;
@@ -6318,7 +6318,7 @@ Car_BC::Car_BC()
 {
     field_54_driver = 0;
     field_74_damage = 0;
-    field_8C = 0;
+    field_8C_damage_level = 0;
     field_98 = 0;
     field_9C_engine_status = 0;
     field_7C_uni_num = 0;

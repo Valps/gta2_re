@@ -2540,7 +2540,7 @@ void Ped::TaxiCustomer_AI_460820()
             }
             else
             {
-                if (target_objective_car->field_8C >= 3u)
+                if (target_objective_car->field_8C_damage_level >= 3)
                 {
                     this->field_21C |= 0x20000000u;
                 }
