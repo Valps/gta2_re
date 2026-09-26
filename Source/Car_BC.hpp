@@ -34,7 +34,7 @@ class Player;
 
 EXTERN_GLOBAL(Fix16, dword_6777D0);
 
-EXPORT Ang16 __stdcall sub_4F7940(s32* a2);
+EXPORT Ang16 __stdcall ReturnAngleFromRoadDirection_4F7940(s32* a2);
 
 namespace car_kind
 {
@@ -170,6 +170,7 @@ class Car_6C
                                                    char_type bIgnorePedRestrictions);
 
     EXPORT Car_BC* GetNearestFrontVehicle_445210(Sprite* a1, u8 a2);
+    EXPORT Car_BC* SpawnBusAtValidRoadPosition_4453E0(Fix16 x, Fix16 y, s32 side, const s32& car_model);
     EXPORT Car_BC* SpawnCarOnRoadNetwork_4458B0(Fix16 xpos, Fix16 ypos, s32 a4, s32 car_model_type);
     EXPORT Car_BC* SpawnCarAt_446230(Fix16 xpos, Fix16 ypos, Fix16 zpos, Ang16 rotation, s32 car_info_idx, Fix16 maybe_w_scale);
     EXPORT Trailer* SpawnCabAndTrailer_446530(Fix16 xpos, Fix16 ypos, Ang16 rotation, s32 car_idx, s32 trailer_idx);
@@ -193,6 +194,11 @@ class Car_6C
     inline Car_BC* SpawnCar_4764A0(Fix16 xpos, Fix16 ypos, Fix16 zpos, Ang16 rotation, s32 car_info_idx)
     {
         return SpawnCarAt_446230(xpos, ypos, zpos, rotation, car_info_idx, dword_6F7690);
+    }
+
+    inline Car_BC* SpawnCar_426E10_v2(Fix16 xpos, Fix16 ypos, Fix16 zpos, Ang16 rotation, s32 car_info_idx)
+    {
+        return SpawnCarAt_446230(xpos, ypos, zpos, rotation, car_info_idx, dword_6777D0);
     }
 
     // unknown inlined function
@@ -934,6 +940,12 @@ class Car_BC
         return !sub_421620() && !inline_check_0x10_info_421640() && !IsTrainModel_403BA0() && !sub_447ED0();
     }
 
+    void sub_426E00()
+    {
+        field_9C_engine_status = 3;
+        sub_43BFE0();
+    }
+
     inline Ang16 get_car_rotation_416BB0()
     {
         return field_50_car_sprite->field_0;
@@ -998,7 +1010,7 @@ class Car_BC
     char_type field_83;
     s32 field_84_car_info_idx;
     s32 field_88_despawn_status;
-    char_type field_8C;
+    u8 field_8C_damage_level;
     char_type field_8D;
     char_type field_8E;
     char_type field_8F;

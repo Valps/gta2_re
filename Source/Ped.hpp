@@ -152,7 +152,7 @@ class Ped
     EXPORT void UpdateFollowPedObjective_468E80();
     EXPORT s32 sub_469010();
     EXPORT void sub_469030();
-    EXPORT void sub_469060();
+    EXPORT void GotoAreaByAnyMeans_469060();
     EXPORT void sub_469BD0();
     EXPORT void GuardSpot_469BF0();
     EXPORT void sub_469D60();
@@ -339,6 +339,11 @@ class Ped
     void set_field_150_target_objective_car(Car_BC* ptr)
     {
         field_150_target_objective_car = ptr;
+    }
+
+    Car_BC* get_target_objective_car_403AB0()
+    {
+        return field_150_target_objective_car;
     }
 
     void set_ped_type(s32 param_1)

@@ -80,8 +80,8 @@ void RouteFinder::ShowJunctionIds_588620()
 MATCH_FUNC(0x588810)
 void RouteFinder::RoadOff_588810(u8 x, u8 y, u8 z)
 {
-    const u16 r1 = RouteFinder::sub_588E60(x, y, z, 0, GREEN_OR_RED_3);
-    const u16 r2 = RouteFinder::sub_588E60(x, y, z, 1, GREEN_OR_RED_3);
+    const u16 r1 = RouteFinder::sub_588E60(x, y, z, 0, green_or_red_3);
+    const u16 r2 = RouteFinder::sub_588E60(x, y, z, 1, green_or_red_3);
     if (r1 && r2)
     {
         Junction_10* j1 = &field_8[r1];
@@ -99,8 +99,8 @@ void RouteFinder::RoadOff_588810(u8 x, u8 y, u8 z)
     }
     else
     {
-        const u16 r3 = RouteFinder::sub_588F30(x, y, z, 0, GREEN_OR_RED_3);
-        const u16 r4 = RouteFinder::sub_588F30(x, y, z, 1, GREEN_OR_RED_3);
+        const u16 r3 = RouteFinder::sub_588F30(x, y, z, 0, green_or_red_3);
+        const u16 r4 = RouteFinder::sub_588F30(x, y, z, 1, green_or_red_3);
         if (r3 && r4)
         {
             Junction_10* j1 = &field_8[r3];
@@ -124,8 +124,8 @@ MATCH_FUNC(0x588950)
 void RouteFinder::RoadOn_588950(u8 x, u8 y, u8 z)
 {
     // Strangely not the exact inverse logic of RoadOff
-    const u16 r1 = RouteFinder::sub_588E60(x, y, z, 0, GREEN_OR_RED_3);
-    const u16 r2 = RouteFinder::sub_588E60(x, y, z, 1, GREEN_OR_RED_3);
+    const u16 r1 = RouteFinder::sub_588E60(x, y, z, 0, green_or_red_3);
+    const u16 r2 = RouteFinder::sub_588E60(x, y, z, 1, green_or_red_3);
     if (r1 && r2)
     {
         Junction_10* j1 = &field_8[r1];
@@ -142,8 +142,8 @@ void RouteFinder::RoadOn_588950(u8 x, u8 y, u8 z)
         }
     }
 
-    const u16 r3 = RouteFinder::sub_588F30(x, y, z, 0, GREEN_OR_RED_3);
-    const u16 r4 = RouteFinder::sub_588F30(x, y, z, 1, GREEN_OR_RED_3);
+    const u16 r3 = RouteFinder::sub_588F30(x, y, z, 0, green_or_red_3);
+    const u16 r4 = RouteFinder::sub_588F30(x, y, z, 1, green_or_red_3);
     if (r3 && r4)
     {
         Junction_10* j1 = &field_8[r3];
@@ -278,19 +278,19 @@ bool RouteFinder::HasBlockDesiredArrow_588CA0(gmp_block_info* block, s32 arrow_t
 
             switch (arrow_type)
             {
-                case GREEN_ONLY_1:
+                case green_1:
                     if ((block->field_A_arrows & 4) != 0) // green up
                     {
                         return true;
                     }
                     break;
-                case RED_ONLY_2:
+                case red_2:
                     if ((block->field_A_arrows & 0x40) != 0) // red up
                     {
                         return true;
                     }
                     break;
-                case GREEN_OR_RED_3:
+                case green_or_red_3:
                     if ((block->field_A_arrows & 0x44) != 0) // green or red up
                     {
                         return true;
@@ -302,19 +302,19 @@ bool RouteFinder::HasBlockDesiredArrow_588CA0(gmp_block_info* block, s32 arrow_t
         case DOWN_2:
             switch (arrow_type)
             {
-                case GREEN_ONLY_1:
+                case green_1:
                     if ((block->field_A_arrows & 8) != 0) // green down
                     {
                         return true;
                     }
                     break;
-                case RED_ONLY_2:
+                case red_2:
                     if ((block->field_A_arrows & 0x80) != 0) // red down
                     {
                         return true;
                     }
                     break;
-                case GREEN_OR_RED_3:
+                case green_or_red_3:
                     if ((block->field_A_arrows & 0x88) != 0) // green or red down
                     {
                         return true;
@@ -326,19 +326,19 @@ bool RouteFinder::HasBlockDesiredArrow_588CA0(gmp_block_info* block, s32 arrow_t
         case LEFT_3:
             switch (arrow_type)
             {
-                case GREEN_ONLY_1:
+                case green_1:
                     if ((block->field_A_arrows & 1) != 0) // green left
                     {
                         return true;
                     }
                     break;
-                case RED_ONLY_2:
+                case red_2:
                     if ((block->field_A_arrows & 0x10) != 0) // red left
                     {
                         return true;
                     }
                     break;
-                case GREEN_OR_RED_3:
+                case green_or_red_3:
                     if ((block->field_A_arrows & 0x11) != 0) // green or red left
                     {
                         return true;
@@ -350,19 +350,19 @@ bool RouteFinder::HasBlockDesiredArrow_588CA0(gmp_block_info* block, s32 arrow_t
         case RIGHT_4:
             switch (arrow_type)
             {
-                case GREEN_ONLY_1:
+                case green_1:
                     if ((block->field_A_arrows & 2) != 0) // green right
                     {
                         return true;
                     }
                     break;
-                case RED_ONLY_2:
+                case red_2:
                     if ((block->field_A_arrows & 0x20) != 0) // red right
                     {
                         return true;
                     }
                     break;
-                case GREEN_OR_RED_3:
+                case green_or_red_3:
                     if ((block->field_A_arrows & 0x22) != 0) // green or red right
                     {
                         return true;
@@ -375,23 +375,23 @@ bool RouteFinder::HasBlockDesiredArrow_588CA0(gmp_block_info* block, s32 arrow_t
 }
 
 WIP_FUNC(0x588de0)
-char_type RouteFinder::sub_588DE0(gmp_block_info* pBlock, s32 arrow_type, s32 a4)
+char_type RouteFinder::sub_588DE0(gmp_block_info* pBlock, s32 arrow_type, s32 road_direction)
 {
     WIP_IMPLEMENTED;
 
     char_type result = 0;
-    switch (a4)
+    switch (road_direction)
     {
-        case 1:
+        case road_direction::up_1:
             result = HasBlockDesiredArrow_588CA0(pBlock, arrow_type, UP_1);
             break;
-        case 2:
+        case road_direction::down_2:
             result = HasBlockDesiredArrow_588CA0(pBlock, arrow_type, DOWN_2);
             break;
-        case 3:
+        case road_direction::right_3:
             result = HasBlockDesiredArrow_588CA0(pBlock, arrow_type, RIGHT_4);
             break;
-        case 4:
+        case road_direction::left_4:
             result = HasBlockDesiredArrow_588CA0(pBlock, arrow_type, LEFT_3);
             break;
         default:

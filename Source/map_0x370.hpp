@@ -269,9 +269,9 @@ enum
 
 enum gmp_arrow_type
 {
-    GREEN_ONLY_1 = 1,
-    RED_ONLY_2 = 2,
-    GREEN_OR_RED_3 = 3,
+    green_1 = 1,
+    red_2 = 2,
+    green_or_red_3 = 3,
 };
 
 EXTERN_GLOBAL_ARRAY(gmp_map_slope, byte_6F5BA8, 64);
