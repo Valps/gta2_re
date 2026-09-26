@@ -1,4 +1,5 @@
 #include "PedGroup.hpp"
+#include "Car_BC.hpp"
 #include "Globals.hpp"
 #include "Ped.hpp"
 #include "enums.hpp"
@@ -723,12 +724,29 @@ bool PedGroup::IsMemberTooFarFromLeader_4CAC20(u8 idx)
     return false;
 }
 
-// https://decomp.me/scratch/MrO9e
-STUB_FUNC(0x4cad40)
+MATCH_FUNC(0x4cad40)
 bool PedGroup::IsLeaderCloseToTargetCar_4CAD40()
 {
-    NOT_IMPLEMENTED;
-    return 0;
+    Fix16 leader_xpos = field_2C_ped_leader->get_cam_x();
+    Car_BC* pTargetCar = field_2C_ped_leader->get_target_to_enter_403B10();
+    if (!pTargetCar)
+    {
+        pTargetCar = field_2C_ped_leader->get_target_objective_car_403AB0();
+    }
+
+    Fix16 x_diff = leader_xpos - pTargetCar->field_50_car_sprite->field_14_xy.x;
+    Fix16 y_diff = field_2C_ped_leader->get_cam_y() - pTargetCar->field_50_car_sprite->field_14_xy.y;
+
+    Fix16 x_abs = Fix16::Abs(x_diff);
+    Fix16 y_abs = Fix16::Abs(y_diff);
+
+    Fix16 max_distance = (x_abs > y_abs) ? x_abs : y_abs;
+
+    if (max_distance <= dword_67F630)
+    {
+        return true;
+    }
+    return false;
 }
 
 STUB_FUNC(0x4cae80)

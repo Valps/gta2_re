@@ -341,6 +341,11 @@ class Ped
         field_150_target_objective_car = ptr;
     }
 
+    Car_BC* get_target_objective_car_403AB0()
+    {
+        return field_150_target_objective_car;
+    }
+
     void set_ped_type(s32 param_1)
     {
         field_238_ped_type = param_1;
