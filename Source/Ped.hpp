@@ -152,7 +152,7 @@ class Ped
     EXPORT void UpdateFollowPedObjective_468E80();
     EXPORT s32 sub_469010();
     EXPORT void sub_469030();
-    EXPORT void sub_469060();
+    EXPORT void GotoAreaByAnyMeans_469060();
     EXPORT void sub_469BD0();
     EXPORT void GuardSpot_469BF0();
     EXPORT void sub_469D60();
