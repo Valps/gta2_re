@@ -440,11 +440,31 @@ u32 PedGroup::sub_4CA3E0()
     return field_2C_ped_leader->field_21C_bf.b2;
 }
 
-STUB_FUNC(0x4ca3f0)
-Ped* PedGroup::FindFarthestMember_4CA3F0(u32* a2)
+MATCH_FUNC(0x4ca3f0)
+Ped* PedGroup::FindFarthestMember_4CA3F0(Fix16* pFoundDistance)
 {
-    NOT_IMPLEMENTED;
-    return 0;
+    Fix16 max_distance = Fix16(0);
+    u8 found_index = 0;
+    Fix16 x_abs;
+    Fix16 y_abs;
+    for (u8 i = 0; i < field_34_count; i++)
+    {
+        Fix16 x_diff = field_2C_ped_leader->get_cam_x() - field_4_ped_list[i]->get_cam_x();
+        Fix16 y_diff = field_2C_ped_leader->get_cam_y() - field_4_ped_list[i]->get_cam_y();
+
+        x_abs = Fix16::Abs(x_diff);
+        y_abs = Fix16::Abs(y_diff);
+
+        Fix16 curr_distance = (x_abs > y_abs) ? x_abs : y_abs;
+
+        if (curr_distance > max_distance)
+        {
+            max_distance = curr_distance;
+            found_index = i;
+        }
+    }
+    *pFoundDistance = max_distance;
+    return field_4_ped_list[found_index];
 }
 
 MATCH_FUNC(0x4ca4b0)

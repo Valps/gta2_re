@@ -5512,7 +5512,8 @@ bool Ped::sub_465CD0()
     {
         if (field_14C)
         {
-            if (field_25C_internal_objective == 20 || field_25C_internal_objective == 23)
+            if (field_25C_internal_objective == objectives_enum::kill_char_on_foot_20 
+                || field_25C_internal_objective == objectives_enum::punch_char_23)
             {
                 return true;
             }
