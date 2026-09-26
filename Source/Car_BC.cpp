@@ -138,9 +138,9 @@ DEFINE_GLOBAL_INIT(Fix16, dword_677920, Fix16(0x11C, 0), 0x677920);
 DEFINE_GLOBAL_INIT(Fix16, k_dword_6778C8, Fix16(0x2800, 0), 0x6778C8);
 DEFINE_GLOBAL_INIT(Ang16, word_677910, Ang16(4), 0x677910);
 
-DEFINE_GLOBAL_INIT(Ang16, word_6F67EA, Ang16(0x2D0), 0x6F67EA);
-DEFINE_GLOBAL_INIT(Ang16, dword_6F6754, Ang16(0x168), 0x6F6754);
-DEFINE_GLOBAL_INIT(Ang16, word_6F6808, Ang16(0x438), 0x6F6808);
+DEFINE_GLOBAL_INIT(Ang16, word_6F67EA, Ang16(720), 0x6F67EA);
+DEFINE_GLOBAL_INIT(Ang16, dword_6F6754, Ang16(360), 0x6F6754);
+DEFINE_GLOBAL_INIT(Ang16, word_6F6808, Ang16(1080), 0x6F6808);
 DEFINE_GLOBAL_INIT(Ang16, word_6F6D3C, Ang16(0), 0x6F6D3C);
 
 DEFINE_GLOBAL_INIT(Fix16, dword_6772BC, Fix16(0xCCC, 0), 0x6772BC);
@@ -541,25 +541,25 @@ char Car_BC::TrySnapCarToNearestDrivableRoadAndDriveForward_445EC0(Fix16 xpos, F
         ++zTmpInt;
         if (pBlock)
         {
-            if ((pBlock->field_B_slope_type & 3) == 1)
+            if ((pBlock->field_B_slope_type & 3) == ROAD)
             {
-                if (!gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, maybe_direction))
+                if (!gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, maybe_direction))
                 {
-                    if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 1))
+                    if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::up_1))
                     {
-                        maybe_direction = 1;
+                        maybe_direction = road_direction::up_1;
                     }
-                    else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 3))
+                    else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::right_3))
                     {
-                        maybe_direction = 3;
+                        maybe_direction = road_direction::right_3;
                     }
-                    else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 2))
+                    else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::down_2))
                     {
-                        maybe_direction = 2;
+                        maybe_direction = road_direction::down_2;
                     }
-                    else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 4))
+                    else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::left_4))
                     {
-                        maybe_direction = 4;
+                        maybe_direction = road_direction::left_4;
                     }
                     else
                     {
@@ -589,7 +589,7 @@ char Car_BC::TrySnapCarToNearestDrivableRoadAndDriveForward_445EC0(Fix16 xpos, F
                     {
                         field_50_car_sprite->set_xyz_lazy_420600(pos_x, pos_y, pos_z);
 
-                        Ang16 ang = sub_4F7940(&maybe_direction);
+                        Ang16 ang = ReturnAngleFromRoadDirection_4F7940(&maybe_direction);
                         field_50_car_sprite->set_ang_lazy_420690(ang);
 
                         if (field_58_physics)
@@ -765,7 +765,7 @@ Car_BC* Car_6C::GetNearestFrontVehicle_445210(Sprite* pSprite, u8 k3)
 }
 
 MATCH_FUNC(0x4453E0)
-Car_BC* Car_6C::SpawnBusAtValidRoadPosition_4453E0(Fix16 x, Fix16 y, s32 side, const s32& car_model)
+Car_BC* Car_6C::SpawnBusAtValidRoadPosition_4453E0(Fix16 x, Fix16 y, s32 road_direction, const s32& car_model)
 {
     s32 found_z;
     s32 attempts = 0;
@@ -775,98 +775,98 @@ Car_BC* Car_6C::SpawnBusAtValidRoadPosition_4453E0(Fix16 x, Fix16 y, s32 side, c
         gmp_block_info* pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
         if (pBlock)
         {
-            if ((pBlock->field_B_slope_type & 3) == 1 && !gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, side))
+            if ((pBlock->field_B_slope_type & 3) == 1 && !gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction))
             {
-                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 1))
+                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::up_1))
                 {
-                    side = 1;
+                    road_direction = road_direction::up_1;
                 }
-                else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 3))
+                else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::right_3))
                 {
-                    side = 3;
+                    road_direction = road_direction::right_3;
                 }
-                else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 2))
+                else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::down_2))
                 {
-                    side = 2;
+                    road_direction = road_direction::down_2;
                 }
-                else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 4))
+                else if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::left_4))
                 {
-                    side = 4;
+                    road_direction = road_direction::left_4;
                 }
                 else
                 {
-                    switch (side)
+                    switch (road_direction)
                     {
-                        case 1:
+                        case road_direction::up_1:
                             x += dword_6777D0;
                             y -= dword_6777D0;
                             pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 4))
+                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::left_4))
                             {
-                                side = 4;
+                                road_direction = road_direction::left_4;
                             }
                             else
                             {
                                 x -= k_dword_6777D4;
                                 pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 3))
+                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::right_3))
                                 {
-                                    side = 3;
+                                    road_direction = road_direction::right_3;
                                 }
                             }
                             break;
-                        case 2:
+                        case road_direction::down_2:
                             x += dword_6777D0;
                             y += dword_6777D0;
                             pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 4))
+                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::left_4))
                             {
-                                side = 4;
+                                road_direction = road_direction::left_4;
                             }
                             else
                             {
                                 x -= k_dword_6777D4;
                                 pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 3))
+                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::right_3))
                                 {
-                                    side = 3;
+                                    road_direction = road_direction::right_3;
                                 }
                             }
                             break;
-                        case 3:
+                        case road_direction::right_3:
                             x += dword_6777D0;
                             y -= dword_6777D0;
                             pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 2))
+                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::down_2))
                             {
-                                side = 2;
+                                road_direction = road_direction::down_2;
                             }
                             else
                             {
                                 y += k_dword_6777D4;
                                 pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 1))
+                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::up_1))
                                 {
-                                    side = 1;
+                                    road_direction = road_direction::up_1;
                                 }
                             }
                             break;
-                        case 4:
+                        case road_direction::left_4:
                             x -= dword_6777D0;
                             y -= dword_6777D0;
                             pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
 
-                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 2))
+                            if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::down_2))
                             {
-                                side = 2;
+                                road_direction = road_direction::down_2;
                             }
                             else
                             {
                                 y += k_dword_6777D4;
                                 pBlock = gMap_0x370_6F6268->FindHighestBlockForCoord_4E4C30(x.ToInt(), y.ToInt(), &found_z);
-                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, 1, 1))
+                                if (gRouteFinder_6FFDC8->sub_588DE0(pBlock, green_1, road_direction::up_1))
                                 {
-                                    side = 1;
+                                    road_direction = road_direction::up_1;
                                 }
                             }
                             break;
@@ -883,7 +883,7 @@ Car_BC* Car_6C::SpawnBusAtValidRoadPosition_4453E0(Fix16 x, Fix16 y, s32 side, c
                 Fix16 sprite_width = dword_6F6850.list[car_info_5AA3B0->w];
                 Fix16 sprite_height = dword_6F6850.list[car_info_5AA3B0->h];
 
-                SwapIf3or4_41FE40(side, sprite_width, sprite_height);
+                SwapIf3or4_41FE40(road_direction, sprite_width, sprite_height);
 
                 Fix16_Rect rect;
                 rect.SetRect_41E350(x - sprite_width, sprite_width + x, y - sprite_height, sprite_height + y);
@@ -892,22 +892,22 @@ Car_BC* Car_6C::SpawnBusAtValidRoadPosition_4453E0(Fix16 x, Fix16 y, s32 side, c
                 if (!gPurpleDoom_1_679208->CheckRectForCollisions_477F60(&rect, 0, 0, 0) && !rect.CanRectEnterMovementRegion_59DE80() &&
                     !gGame_0x40_67E008->IsRectVisibleToAnyPlayer_4B9B10(&rect))
                 {
-                    return Car_6C::SpawnCar_426E10_v2(x, y, ground_z, sub_4F7940(&side), car_model);
+                    return Car_6C::SpawnCar_426E10_v2(x, y, ground_z, ReturnAngleFromRoadDirection_4F7940(&road_direction), car_model);
                 }
             }
         }
-        switch (side)
+        switch (road_direction)
         {
-            case 1:
+            case road_direction::up_1:
                 y += dword_6777D0;
                 break;
-            case 2:
+            case road_direction::down_2:
                 y -= dword_6777D0;
                 break;
-            case 3:
+            case road_direction::right_3:
                 x -= dword_6777D0;
                 break;
-            case 4:
+            case road_direction::left_4:
                 x += dword_6777D0;
                 break;
             default:
@@ -4614,16 +4614,16 @@ void Car_BC::sub_441380()
 }
 
 WIP_FUNC(0x4F7940)
-EXPORT Ang16 __stdcall sub_4F7940(s32* a2)
+EXPORT Ang16 __stdcall ReturnAngleFromRoadDirection_4F7940(s32* road_direction)
 {
     WIP_IMPLEMENTED;
-    switch (*a2)
+    switch (*road_direction)
     {
-        case 1:
+        case road_direction::up_1:
             return word_6F67EA;
-        case 3:
+        case road_direction::right_3:
             return dword_6F6754;
-        case 4:
+        case road_direction::left_4:
             return word_6F6808;
         default:
             return word_6F6D3C;
@@ -4661,12 +4661,12 @@ void Car_BC::UpdateTrainCarriagesOnTrack_4413B0(Fix16 xpos, Fix16 ypos, Fix16 zp
         if (bUnknown)
         {
             s32 v21 = gMap_0x370_6F6268->sub_4E7190(&newx, &newy, &newz, k_dword_6777D4);
-            v10 = sub_4F7940(&v21);
+            v10 = ReturnAngleFromRoadDirection_4F7940(&v21);
         }
         else
         {
             s32 v22 = gMap_0x370_6F6268->sub_4E6660(&newx, &newy, &newz, k_dword_6777D4);
-            v10 = sub_4F7940(&v22);
+            v10 = ReturnAngleFromRoadDirection_4F7940(&v22);
         }
 
         pTrainCarIter->field_50_car_sprite->set_xyz_lazy_420600(newx, newy, newz);
@@ -7650,7 +7650,7 @@ char_type Car_14::SpawnTrafficCar_582480(s32 a2, s32 arrow_direction, s32 a4)
                     {
                         if (!v108)
                         {
-                            v88 = sub_4F7940(&arrow_direction);
+                            v88 = ReturnAngleFromRoadDirection_4F7940(&arrow_direction);
                             //car_model_1 = car_model_idx; // = rng_max_
                             //v128 = *v88; // LOWORD =
                             if (car_model_idx == car_model_enum::TRAIN || car_model_idx == car_model_enum::TRAINCAB ||

@@ -83,7 +83,7 @@ class RouteFinder
     EXPORT void Load_RGEN_588B30();
     EXPORT void Reset_588C60();
     EXPORT bool HasBlockDesiredArrow_588CA0(gmp_block_info* block, s32 a2, u8 a3);
-    EXPORT char_type sub_588DE0(gmp_block_info* a1, s32 arrow_type, s32 a4);
+    EXPORT char_type sub_588DE0(gmp_block_info* pBlock, s32 arrow_type, s32 road_direction);
     EXPORT u16 sub_588E60(u8 x, u8 y, u8 z, char_type a5, s32 arrow_type);
     EXPORT u16 sub_588F30(u8 x_coord, u8 y_coord, u8 z_coord, char_type a5, s32 arrow_type);
     EXPORT u16 sub_589000(u8 x_coord, u8 y_coord, u8 z_coord, char_type a5, s32 arrow_type);

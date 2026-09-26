@@ -3002,38 +3002,38 @@ char_type Map_0x370::sub_4E5E90(gmp_block_info* pBlock, s32 direction, char_type
         case 1:
             if (a3)
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, UP_1);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, UP_1);
             }
             else
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, DOWN_2);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, DOWN_2);
             }
         case 2:
             if (a3)
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, DOWN_2);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, DOWN_2);
             }
             else
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, UP_1);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, UP_1);
             }
         case 3:
             if (a3)
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, RIGHT_4);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, RIGHT_4);
             }
             else
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, LEFT_3);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, LEFT_3);
             }
         case 4:
             if (a3)
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, LEFT_3);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, LEFT_3);
             }
             else
             {
-                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_ONLY_1, RIGHT_4);
+                return gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_1, RIGHT_4);
             }
             break;
         default:
@@ -3045,7 +3045,7 @@ MATCH_FUNC(0x4E5FC0)
 s32 Map_0x370::GetArrowDirectionFromBlock_4E5FC0(gmp_block_info* pBlock, char_type bDontFlip)
 {
     s32 result = 0;
-    if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_OR_RED_3, RIGHT_4))
+    if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_or_red_3, RIGHT_4))
     {
         if (bDontFlip)
         {
@@ -3056,7 +3056,7 @@ s32 Map_0x370::GetArrowDirectionFromBlock_4E5FC0(gmp_block_info* pBlock, char_ty
             result = road_direction::left_4;
         }
     }
-    else if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_OR_RED_3, DOWN_2))
+    else if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_or_red_3, DOWN_2))
     {
         if (bDontFlip)
         {
@@ -3067,7 +3067,7 @@ s32 Map_0x370::GetArrowDirectionFromBlock_4E5FC0(gmp_block_info* pBlock, char_ty
             result = road_direction::up_1;
         }
     }
-    else if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_OR_RED_3, LEFT_3))
+    else if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_or_red_3, LEFT_3))
     {
         if (bDontFlip)
         {
@@ -3078,7 +3078,7 @@ s32 Map_0x370::GetArrowDirectionFromBlock_4E5FC0(gmp_block_info* pBlock, char_ty
             result = road_direction::right_3;
         }
     }
-    else if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, GREEN_OR_RED_3, UP_1))
+    else if (gRouteFinder_6FFDC8->HasBlockDesiredArrow_588CA0(pBlock, green_or_red_3, UP_1))
     {
         if (bDontFlip)
         {

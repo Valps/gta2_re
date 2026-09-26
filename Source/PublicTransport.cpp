@@ -29,20 +29,20 @@ Fix16 dword_6FEEDC = Fix16(0xCCC, 0); //DEFINE_GLOBAL_INIT(Fix16, dword_6FEEDC, 
 Fix16 dword_6FEEE4 = Fix16(0x1999, 0); //DEFINE_GLOBAL_INIT(Fix16, dword_6FEEE4, Fix16(0x1999, 0), 0x6FEEE4);
 
 MATCH_FUNC(0x577E20)
-char __stdcall sub_577E20(int param_1, gmp_block_info* param_2)
+char __stdcall HasBlockGreenArrowAtDirection_577E20(s32 direction, gmp_block_info* param_2)
 {
-    switch (param_1)
+    switch (direction)
     {
-        case 1:
-            return param_2->field_A_arrows >> 2 & 1;
-        case 2:
-            return param_2->field_A_arrows >> 3 & 1;
-        case 3:
-            return param_2->field_A_arrows >> 1 & 1;
-        case 4:
-            return param_2->field_A_arrows & 1;
+        case road_direction::up_1:
+            return param_2->field_A_arrows >> 2 & 1; // up
+        case road_direction::down_2:
+            return param_2->field_A_arrows >> 3 & 1; // down
+        case road_direction::right_3:
+            return param_2->field_A_arrows >> 1 & 1; // right
+        case road_direction::left_4:
+            return param_2->field_A_arrows & 1; // left
         default:
-            return '\x01';
+            return true;
     }
 }
 

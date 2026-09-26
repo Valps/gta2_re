@@ -5600,16 +5600,16 @@ void CarAI_78::sub_453A40()
     {
         switch (v4)
         {
-            case 1:
+            case road_direction::up_1:
                 a5 = (AngleFace_4F78F0 != 3) + 1;
                 break;
-            case 2:
+            case road_direction::down_2:
                 a5 = (AngleFace_4F78F0 == 3) + 1;
                 break;
-            case 3:
+            case road_direction::right_3:
                 a5 = (AngleFace_4F78F0 != 2) + 1;
                 break;
-            case 4:
+            case road_direction::left_4:
                 a5 = (AngleFace_4F78F0 == 2) + 1;
                 break;
             default:
@@ -5618,7 +5618,7 @@ void CarAI_78::sub_453A40()
     }
 
     Fix16 i;
-    for (i = Ang16::Ang16_to_Fix16(sub_4F7940(&v4)); i < kF16Zero_677B90; i += dword_677C84)
+    for (i = Ang16::Ang16_to_Fix16(ReturnAngleFromRoadDirection_4F7940(&v4)); i < kF16Zero_677B90; i += dword_677C84)
     {
         ;
     }
