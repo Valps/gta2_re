@@ -7,6 +7,7 @@ DEFINE_GLOBAL_ARRAY(PedGroup, pedGroups_67EF20, 20, 0x67EF20);
 DEFINE_GLOBAL(Fix16, dword_67F610, 0x67F610);
 DEFINE_GLOBAL_INIT(Fix16, k_dword_67EEE4, Fix16(0x500, 0), 0x67EEE4);
 DEFINE_GLOBAL_INIT(char_type, byte_620838, 1, 0x620838);
+DEFINE_GLOBAL_INIT(Fix16, dword_67F630, Fix16(4), 0x67F630);
 
 STUB_FUNC(0x4c8e60)
 void PedGroup::sub_4C8E60()
@@ -703,12 +704,23 @@ char_type PedGroup::AreAllMembersOnFoot_4CAB80()
     return true;
 }
 
-// https://decomp.me/scratch/p3Ujn
-STUB_FUNC(0x4cac20)
-bool PedGroup::IsMemberTooFarFromLeader_4CAC20(s32 idx)
+MATCH_FUNC(0x4cac20)
+bool PedGroup::IsMemberTooFarFromLeader_4CAC20(u8 idx)
 {
-    NOT_IMPLEMENTED;
-    return 0;
+    Ped* pMember = field_4_ped_list[idx];
+    Fix16 x_diff = pMember->field_1AC_cam.x - field_2C_ped_leader->field_1AC_cam.x;
+    Fix16 y_diff = pMember->field_1AC_cam.y - field_2C_ped_leader->field_1AC_cam.y;
+
+    Fix16 x_abs = Fix16::Abs(x_diff);
+    Fix16 y_abs = Fix16::Abs(y_diff);
+
+    Fix16 max_distance = (x_abs > y_abs) ? x_abs : y_abs;
+
+    if (max_distance > dword_67F630)
+    {
+        return true;
+    }
+    return false;
 }
 
 // https://decomp.me/scratch/MrO9e

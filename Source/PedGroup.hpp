@@ -39,7 +39,7 @@ class PedGroup
     EXPORT bool IsAllMembersInSomeCar_4CAA20();
     EXPORT char_type HasNoActiveMembers_4CAAE0();
     EXPORT char_type AreAllMembersOnFoot_4CAB80();
-    EXPORT bool IsMemberTooFarFromLeader_4CAC20(s32 idx);
+    EXPORT bool IsMemberTooFarFromLeader_4CAC20(u8 idx);
     EXPORT bool IsLeaderCloseToTargetCar_4CAD40();
     EXPORT Ped* FindNearestOtherMember_4CAE80(u8 idx);
     EXPORT static void ResetAllGroups_4CB080();
