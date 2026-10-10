@@ -127,6 +127,37 @@ size_t __stdcall File::Read_4A6D90(void* Buffer, size_t ElementSize, size_t Elem
     return ret;
 }
 
+// Reads the whole file into the caller's buffer, which holds at most *pMaxSize bytes
+MATCH_FUNC(0x4A6DB0)
+size_t __stdcall File::ReadFileToFixedBuffer_4A6DB0(const char_type* FileName, void* pBuffer, size_t* pMaxSize)
+{
+    Error_SetName_4A0770(FileName);
+    FILE* hFile = crt::fopen(FileName, "rb");
+    if (!hFile)
+    {
+        FatalError_4A38C0(Gta2Error::FreeloaderEpisodeUnknown, "C:\\Splitting\\Gta2\\Source\\File.cpp", 192);
+    }
+
+    size_t size = GetFileSize_4A6B10(hFile);
+    if (size > *pMaxSize)
+    {
+        crt::fclose(hFile);
+        FatalError_4A38C0(Gta2Error::FileTooLarge, "C:\\Splitting\\Gta2\\Source\\File.cpp", 198, size - *pMaxSize);
+    }
+
+    if (Read_4A6D90(pBuffer, size, 1u, hFile) != 1)
+    {
+        crt::fclose(hFile);
+        FatalError_4A38C0(Gta2Error::FileReadFailure, "C:\\Splitting\\Gta2\\Source\\File.cpp", 204);
+    }
+
+    if (crt::fclose(hFile))
+    {
+        FatalError_4A38C0(Gta2Error::FileCloseError, "C:\\Splitting\\Gta2\\Source\\File.cpp", 208);
+    }
+    return size;
+}
+
 MATCH_FUNC(0x4A6E80)
 void __stdcall File::WriteBufferToFile_4A6E80(const char_type* FileName, void* Buffer, size_t* pBufferSize)
 {

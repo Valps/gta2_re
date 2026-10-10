@@ -14,6 +14,7 @@ class File
 
     EXPORT static void __stdcall CheckReadOnlyFile_4A6BE0(const char_type* FileName, s32 expectedSize);
     EXPORT static void* __stdcall ReadFileToBuffer_4A6C80(const char_type* FileName, size_t* a2);
+    EXPORT static size_t __stdcall ReadFileToFixedBuffer_4A6DB0(const char_type* FileName, void* pBuffer, size_t* pMaxSize);
 
     EXPORT static size_t __stdcall Read_4A6D90(void* Buffer, size_t ElementSize, size_t ElementCount, FILE* Stream);
 
