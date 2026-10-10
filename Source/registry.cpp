@@ -471,6 +471,56 @@ DWORD Registry::Get_Int_Setting_5874E0(HKEY hKey, const char_type* lpValueName)
     return (DWORD)lpValueName;
 }
 
+MATCH_FUNC(0x5875A0)
+s32 __stdcall Registry::Get_Binary_Value_5875A0(HKEY hKey, const char_type* keyPath, LPBYTE lpData)
+{
+    s32 ret = 0;
+    s32 size = gRegistry_6FF968.Get_Int_5873E0(hKey, keyPath);
+    if (size)
+    {
+        if (gRegistry_6FF968.Get_Binary_587340(hKey, keyPath, size, lpData))
+        {
+            ret = 1;
+        }
+    }
+    return ret;
+}
+
+MATCH_FUNC(0x5875E0)
+s32 __stdcall Registry::Set_WString_Value_5875E0(HKEY hKey, const char_type* keyPath, const wchar_t* pStr)
+{
+    s32 ret = 0;
+    u32 size = 2 * wcslen(pStr) + 2;
+    if (gRegistry_6FF968.Set_Binary_5872A0(hKey, keyPath, (BYTE*)pStr, size))
+    {
+        ret = 1;
+    }
+    return ret;
+}
+
+MATCH_FUNC(0x587620)
+char_type Registry::Network_Setting_Exists_587620(const char_type* lpValueName)
+{
+    HKEY hKey;
+    u32 Data;
+    DWORD cbData;
+    char_type ret = 0;
+    if (CreateNetworkRoot_587420(&hKey))
+    {
+        cbData = sizeof(DWORD);
+        if (RegQueryValueExA(hKey, lpValueName, 0, 0, reinterpret_cast<BYTE*>(&Data), &cbData) == ERROR_SUCCESS)
+        {
+            ret = 1;
+        }
+    }
+
+    if (RegCloseKey(hKey) != ERROR_SUCCESS)
+    {
+        FatalError_4A38C0(Gta2Error::CloseRegistryKeyFail, "C:\\Splitting\\Gta2\\Source\\registry.cpp", 1020);
+    }
+    return ret;
+}
+
 MATCH_FUNC(0x587690)
 s32 Registry::Set_Network_Setting_587690(const char_type* lpValueName, s32 a2)
 {
