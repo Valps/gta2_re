@@ -68,6 +68,7 @@ class ExplosionPool_7A8
 class ExplosionPool_3D4
 {
   public:
+    EXPORT Explosion_30* Allocate_543900();
     EXPORT ExplosionPool_3D4();
     EXPORT ~ExplosionPool_3D4();
     Explosion_30 field_0_explosions[20];

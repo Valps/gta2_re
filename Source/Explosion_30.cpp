@@ -32,6 +32,7 @@ DEFINE_GLOBAL_INIT(Fix16, dword_6FD328, dword_6FD448, 0x6FD328);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD330, dword_6FD328 * 2, 0x6FD330);
 
 DEFINE_GLOBAL_INIT(s16, gExplosionId_623F18, 1, 0x623F18);
+DEFINE_GLOBAL_INIT(s16, gExplosionId20_623F1A, 1, 0x623F1A); // ids for ExplosionPool_3D4
 
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD2F0, Fix16(0xCCC, 0), 0x6FD2F0);
 
@@ -1171,6 +1172,25 @@ ExplosionPool_7A8::ExplosionPool_7A8()
 MATCH_FUNC(0x5438f0)
 ExplosionPool_7A8::~ExplosionPool_7A8()
 {
+}
+
+MATCH_FUNC(0x543900)
+Explosion_30* ExplosionPool_3D4::Allocate_543900()
+{
+    for (u8 idx = 0; idx < GTA2_COUNTOF(field_0_explosions); idx++)
+    {
+        if (!this->field_3C0_bUsed[idx])
+        {
+            this->field_0_explosions[idx].Init_543650();
+            this->field_0_explosions[idx].field_4_idx = idx;
+            this->field_0_explosions[idx].field_6_id = gExplosionId20_623F1A;
+            this->field_0_explosions[idx].field_0_bIn20Pool = 1;
+            gExplosionId20_623F1A++;
+            this->field_3C0_bUsed[idx] = 1;
+            return &this->field_0_explosions[idx];
+        }
+    }
+    return 0;
 }
 
 MATCH_FUNC(0x543980)
