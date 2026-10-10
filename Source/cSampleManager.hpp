@@ -90,6 +90,7 @@ class cSampleManager
 
     EXPORT void StopChannel3D_58DFC0(s32 samp_idx);
 
+    EXPORT u8 Get3DSampleCount_58E000();
     EXPORT void SetEaxEnvironment_58E010(s32 env_idx);
 
     EXPORT char_type Open3DProvider_58E140(s32 a2);

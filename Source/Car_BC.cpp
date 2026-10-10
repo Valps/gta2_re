@@ -681,6 +681,13 @@ u32 Car_6C::SelectTrafficCarModel_444AB0(Player* pPlayer, gmp_zone_info* pZoneIn
     return result;
 }
 
+// No callers. Five ignored arguments.
+MATCH_FUNC(0x444CE0)
+char_type Car_6C::NoRefs_444CE0(s32 a1, s32 a2, s32 a3, s32 a4, s32 a5)
+{
+    return 1;
+}
+
 MATCH_FUNC(0x444cf0)
 Car_BC* Car_6C::SpawnCarAtRoadDirection_444CF0(s32 car_model_type, Fix16 xpos, Fix16 ypos, Fix16 zpos)
 {

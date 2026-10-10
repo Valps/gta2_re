@@ -732,6 +732,12 @@ void cSampleManager::StopChannel3D_58DFC0(s32 samp_idx)
     }
 }
 
+MATCH_FUNC(0x58E000)
+u8 cSampleManager::Get3DSampleCount_58E000()
+{
+    return field_1EB2_3d_samp_count;
+}
+
 MATCH_FUNC(0x58E010)
 void cSampleManager::SetEaxEnvironment_58E010(s32 env_idx)
 {
