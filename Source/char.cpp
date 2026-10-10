@@ -160,6 +160,28 @@ EXPORT Ang16 __stdcall ComputeShortestAngleDelta_4056C0(Ang16& a2, Ang16& a3)
     return delta;
 }
 
+// No callers. The angle halfway between a and b, going the short way round. The normalizations of delta
+// are kept at the top level (in a register, where VC6 turns the loops into its division form): through the
+// unary operator- the nested Normalize runs out of inline budget and is called out of line.
+MATCH_FUNC(0x4057B0)
+EXPORT Ang16 __stdcall MidAngle_4057B0(Ang16& a, Ang16& b)
+{
+    Ang16 half;
+    Ang16 delta(b.rValue - a.rValue);
+    delta.Normalize();
+    if (delta > kAng180_669156)
+    {
+        delta.rValue = -delta.rValue;
+        delta.Normalize();
+        half = Ang16(Fix16(delta.rValue) / Fix16(2));
+        half.Normalize_406C20();
+        return a - half;
+    }
+    half = Ang16(Fix16(delta.rValue) / Fix16(2));
+    half.Normalize_406C20();
+    return a + half;
+}
+
 MATCH_FUNC(0x46DD50)
 void Char_B4::SetRemap_46DD50(u8 remap)
 {
