@@ -2287,6 +2287,70 @@ void Frontend::HandleDeletePlayerDialog_4AE9A0()
     }
 }
 
+// Copy protection: picks a random file of the CD table and checks that it is on a CD-ROM drive, has the
+// expected size and can't be opened for writing. The table's sizes must add up to a fixed sum, so it can't be
+// edited. 10.5 has three identical copies (a static function in a header included by three files), so the body
+// is a forced inline here. The count must be defined in another file: with its definition in view VC6 reads it
+// with 32 bit loads instead of the original's 16 bit ones.
+static __forceinline bool CheckCdFile()
+{
+    char_type path[255] = "\0";
+
+    u32 sum = 0;
+    for (u16 i = 0; i < gCdCheckFileCount_6252E0; i++)
+    {
+        sum += gCdCheckFiles_6252E8[i].field_80_size;
+    }
+
+    if (sum == 0x12209BDC)
+    {
+        s16 idx = timeGetTime() % gCdCheckFileCount_6252E0;
+        char_type drive[32];
+        drive[0] = gRoot_sound_66B038.GetAudioDriveLetter_40F150();
+        if (drive[0])
+        {
+            drive[1] = 0;
+            strcpy(path, drive);
+            strcat(path, gBikDriveDataDir_62045C);
+            strcat(path, gCdCheckFiles_6252E8[idx].field_0_name);
+            if (File::IsCdRomDrive_4A6BB0(drive[0]))
+            {
+                FILE* hFile = crt::fopen(path, "rb");
+                if (hFile)
+                {
+                    if (File::GetFileSize_4A6B10(hFile) == gCdCheckFiles_6252E8[idx].field_80_size)
+                    {
+                        if (!crt::fclose(hFile))
+                        {
+                            bool ok = crt::fopen(path, "wb") == 0;
+                            return ok;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+MATCH_FUNC(0x4B80F0)
+EXPORT bool CheckCdFile_4B80F0()
+{
+    return CheckCdFile();
+}
+
+MATCH_FUNC(0x4BBCB0)
+EXPORT bool CheckCdFile_4BBCB0()
+{
+    return CheckCdFile();
+}
+
+MATCH_FUNC(0x4BBFA0)
+EXPORT bool CheckCdFile_4BBFA0()
+{
+    return CheckCdFile();
+}
+
 // https://decomp.me/scratch/ySQ2h
 MATCH_FUNC(0x4B8280)
 void Frontend::HandlePasswordTyping_4B8280()
