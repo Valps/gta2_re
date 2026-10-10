@@ -495,9 +495,11 @@ class FreeLoader
   public:
     EXPORT static s32 __stdcall GetCityInstalled_4AE0F0();
     EXPORT static char_type __stdcall CheckCityInstalled_4AE1F0(u8 a1);
+    EXPORT static void __cdecl MessageBox_4AE170(UINT uType, LPCSTR lpCaption, LPCSTR lpFormat, ...);
     EXPORT static LPCSTR __stdcall GetRegDword_4AE010(HKEY a1, LPCSTR a2, LPCSTR a3);
 };
 
+EXPORT s32 IsFullScreen_5D98D0();
 EXPORT s32 __stdcall SetGamma_5D9910(s32 gamma);
 
 EXTERN_GLOBAL(Frontend*, gFrontend_67DC84);

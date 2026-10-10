@@ -3334,6 +3334,26 @@ Object_2C* Object_5C::NewLight_529AB0(s32 light_type, Fix16 xpos, Fix16 ypos, Fi
     return pNewObj;
 }
 
+MATCH_FUNC(0x529B20)
+Object_2C* Object_5C::NewFlashingLight_529B20(Fix16 xpos,
+                                             Fix16 ypos,
+                                             Fix16 zpos,
+                                             s32 argb,
+                                             Fix16 radius,
+                                             u8 intensity,
+                                             u8 on_time,
+                                             u8 off_time,
+                                             u8 shape)
+{
+    Object_2C* pNewObj = New_529C00(165, xpos, ypos, zpos, kZeroAng_6F8F68, 0);
+    if (pNewObj)
+    {
+        pNewObj->field_C_pAny.pLight->SetColourRadiusIntensity_482D60(argb, radius, intensity);
+        gLight_1D4CC_6F5520->SetFlashing_469070(pNewObj->field_C_pAny.pLight, on_time, off_time, shape);
+    }
+    return pNewObj;
+}
+
 MATCH_FUNC(0x529bc0)
 Object_2C* Object_5C::sub_529BC0(s32 object_type, Fix16 xpos, Fix16 ypos, Fix16 zpos, Ang16 rotation)
 {

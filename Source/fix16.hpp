@@ -432,6 +432,10 @@ class Fix16
         return result;
     }
 
+    // Out-of-line copy of the inline below, at its address (callers use the inline, which VC6 emits as
+    // its own COMDAT copy). Defined in CarPhysics_B0.cpp.
+    EXPORT static Fix16 __stdcall ClampToRangeFlexible_ool_55EEE0(Fix16& a2, Fix16& a3, Fix16& a4);
+
     // NOTE: 10.5 function - matched but inlined
     static inline Fix16 __stdcall ClampToRangeFlexible_55EEE0(Fix16& a2, Fix16& a3, Fix16& a4)
     {

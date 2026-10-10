@@ -2037,6 +2037,13 @@ void CarPhysics_B0::ApplyForwardEngineForce_55EC30()
 }
 
 // https://decomp.me/scratch/foNCl
+// The largest of the three values
+MATCH_FUNC(0x55EEE0)
+Fix16 __stdcall Fix16::ClampToRangeFlexible_ool_55EEE0(Fix16& a2, Fix16& a3, Fix16& a4)
+{
+    return ClampToRangeFlexible_55EEE0(a2, a3, a4);
+}
+
 MATCH_FUNC(0x55ef20)
 void CarPhysics_B0::ApplyReverseEngineForce_55EF20()
 {

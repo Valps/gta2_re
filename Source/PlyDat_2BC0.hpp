@@ -89,6 +89,8 @@ struct PlyDat_2BC0
 
     EXPORT void LoadHiScores_56BE50();
 
+    EXPORT void BuildMergedHiScores_56C170();
+
     EXPORT void InitDefaultHiScores_56C1D0();
 
     EXPORT void SaveHiScores_56BF20();

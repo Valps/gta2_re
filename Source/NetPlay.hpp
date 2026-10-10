@@ -223,6 +223,7 @@ struct NetPlay
     EXPORT s32 SetGroupData_521170(Network_8* a2);
     EXPORT void Set27SavePlayerName_5211F0(s32 a2, s32 a3);
     EXPORT void DisableJoining_521220();
+    EXPORT s32 GetField5CC_5212E0();
     EXPORT void SetExitGameCallBack_521330(s32 pFunc, Game_0x40* pGame);
     EXPORT s32 GetMaxPlayers_521350();
     EXPORT void Send_521370();

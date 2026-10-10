@@ -12,6 +12,7 @@ class Explosion_30
   public:
     EXPORT Explosion_30();
     EXPORT ~Explosion_30();
+    EXPORT void EmitRandomDiagonalParticle_540A40();
     EXPORT void EmitFireTrail_3_12_540D30(Ang16 ang, Fix16 speed);
     EXPORT void EmitFireTrail_4_540F90(Ang16 ang, Fix16 speed);
     EXPORT void EmitFireTrail_13_14_5411E0(Ang16 ang, Fix16 speed);
@@ -68,6 +69,7 @@ class ExplosionPool_7A8
 class ExplosionPool_3D4
 {
   public:
+    EXPORT Explosion_30* Allocate_543900();
     EXPORT ExplosionPool_3D4();
     EXPORT ~ExplosionPool_3D4();
     Explosion_30 field_0_explosions[20];

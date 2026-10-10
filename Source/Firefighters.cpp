@@ -405,6 +405,23 @@ char_type FirefighterPool_54::TryDispatchFirefightersToCar_4A8820(Car_BC* pCar)
     return 1;
 }
 
+MATCH_FUNC(0x4A8890)
+char_type FirefighterPool_54::IsFireEngineSentToCar_4A8890(Car_BC* pFireEngine, Car_BC* pTargetCar)
+{
+    u8 i = 0;
+    Firefighter_28* p = field_0_firefighters;
+    while (i < GTA2_COUNTOF(field_0_firefighters))
+    {
+        if (p && p->field_C_target_car == pTargetCar && p->field_1C_car == pFireEngine)
+        {
+            return 1;
+        }
+        p++;
+        i++;
+    }
+    return 0;
+}
+
 MATCH_FUNC(0x4a88d0)
 void FirefighterPool_54::ResetCount_4A88D0()
 {

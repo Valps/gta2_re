@@ -12,7 +12,9 @@ class File
 
     EXPORT static bool __stdcall IsCdRomDrive_4A6BB0(char_type a1);
 
+    EXPORT static void __stdcall CheckReadOnlyFile_4A6BE0(const char_type* FileName, s32 expectedSize);
     EXPORT static void* __stdcall ReadFileToBuffer_4A6C80(const char_type* FileName, size_t* a2);
+    EXPORT static size_t __stdcall ReadFileToFixedBuffer_4A6DB0(const char_type* FileName, void* pBuffer, size_t* pMaxSize);
 
     EXPORT static size_t __stdcall Read_4A6D90(void* Buffer, size_t ElementSize, size_t ElementCount, FILE* Stream);
 
@@ -42,3 +44,13 @@ class File
 
     EXPORT static char_type __stdcall SkipWhitespace_4A7340(FILE* Stream);
 };
+
+// Copy protection: a file of the game CD with its expected size
+struct CdCheckFile_84
+{
+    char_type field_0_name[128];
+    u32 field_80_size;
+};
+
+EXTERN_GLOBAL(u16, gCdCheckFileCount_6252E0);
+EXTERN_GLOBAL_ARRAY(CdCheckFile_84, gCdCheckFiles_6252E8, 22);

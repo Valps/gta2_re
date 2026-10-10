@@ -104,6 +104,17 @@ void* ErrorLog::log_on_line_written_4D9670(TLogLineCallback pCallBack)
     return this;
 }
 
+// Logs the intro line again on the way out, then closes the file
+MATCH_FUNC(0x4A3610)
+ErrorLog::~ErrorLog()
+{
+    log_intro_4D95A0();
+#if !defined(__clang__) && (_MSC_VER <= 1200)
+    field_0_ofstr.close();
+#endif
+    delete field_3C_pLen;
+}
+
 MATCH_FUNC(0x4D95A0)
 void ErrorLog::log_intro_4D95A0()
 {

@@ -1905,6 +1905,12 @@ void NetPlay::DisableJoining_521220()
     }
 }
 
+MATCH_FUNC(0x5212E0)
+s32 NetPlay::GetField5CC_5212E0()
+{
+    return field_5CC;
+}
+
 MATCH_FUNC(0x521330)
 void NetPlay::SetExitGameCallBack_521330(s32 pFunc, Game_0x40* pGame)
 {
