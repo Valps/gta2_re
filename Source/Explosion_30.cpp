@@ -30,6 +30,9 @@ EXTERN_GLOBAL(Ang16, kAng180_6FD3EE);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD448, Fix16(0x100, 0), 0x6FD448);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD328, dword_6FD448, 0x6FD328);
 DEFINE_GLOBAL_INIT(Fix16, dword_6FD330, dword_6FD328 * 2, 0x6FD330);
+DEFINE_GLOBAL_INIT(Fix16, dword_6FD450, dword_6FD328 / 100, 0x6FD450);
+DEFINE_GLOBAL_INIT(Fix16, dword_6FD44C, dword_6FD328 / 50, 0x6FD44C);
+DEFINE_GLOBAL(s16, gDebrisDirection_6FD5F8, 0x6FD5F8);
 
 DEFINE_GLOBAL_INIT(s16, gExplosionId_623F18, 1, 0x623F18);
 DEFINE_GLOBAL_INIT(s16, gExplosionId20_623F1A, 1, 0x623F1A); // ids for ExplosionPool_3D4
@@ -90,6 +93,74 @@ Explosion_30::~Explosion_30()
 {
     field_14_pObj2C = 0;
     field_1C_pAttachedSprite = 0;
+}
+
+// No callers. Every few frames, a particle thrown in a random diagonal direction from the attached object
+MATCH_FUNC(0x540A40)
+void Explosion_30::EmitRandomDiagonalParticle_540A40()
+{
+    if (this->field_18_particle_cooldown == 0)
+    {
+        Particle_4C* pParticle;
+        gDebrisDirection_6FD5F8 = gRng_6F6784.get_int_4F7AE0(4);
+        switch (gDebrisDirection_6FD5F8)
+        {
+            case 0:
+                pParticle = gParticle_8_6FD5E8->New_53E3C0(dword_6FD44C, dword_6FD44C, dword_6FD330, dword_6FD450, dword_6FD450, 0);
+                break;
+            case 1:
+                pParticle = gParticle_8_6FD5E8->New_53E3C0(dword_6FD44C.Negate_4086A0(),
+                                                           dword_6FD44C,
+                                                           dword_6FD330,
+                                                           dword_6FD450.Negate_4086A0(),
+                                                           dword_6FD450,
+                                                           0);
+                break;
+            case 2:
+                pParticle = gParticle_8_6FD5E8->New_53E3C0(dword_6FD44C,
+                                                           dword_6FD44C.Negate_4086A0(),
+                                                           dword_6FD330,
+                                                           dword_6FD450,
+                                                           dword_6FD450.Negate_4086A0(),
+                                                           0);
+                break;
+            case 3:
+                pParticle = gParticle_8_6FD5E8->New_53E3C0(dword_6FD44C.Negate_4086A0(),
+                                                           dword_6FD44C.Negate_4086A0(),
+                                                           dword_6FD330,
+                                                           dword_6FD450.Negate_4086A0(),
+                                                           dword_6FD450.Negate_4086A0(),
+                                                           0);
+                break;
+            default:
+                pParticle = 0;
+                break;
+        }
+
+        if (pParticle)
+        {
+            pParticle->field_40_pExplosion = this;
+            pParticle->field_44 = this->field_6_id;
+            if (field_14_pObj2C->field_4)
+            {
+                pParticle->field_20_speed = field_14_pObj2C->field_4->field_8_object_2C_ptr->sub_5290F0();
+                pParticle->field_24_angle = field_14_pObj2C->field_4->field_8_object_2C_ptr->field_10_obj_3c->field_4_angle;
+            }
+            pParticle->field_34 = 1;
+            pParticle->field_38_state = 6;
+            pParticle->field_2C_counter = 100;
+            pParticle->field_2E = 100;
+            pParticle->field_30_pNext->SetType_4206F0(sprite_types_enum::code_obj2_8);
+            pParticle->field_30_pNext->set_id_lazy_4206C0(gObjectDefinitions_6FCF00->field_8CA4_def112_sprite_palette);
+            pParticle->field_30_pNext->set_xyz_lazy_420600(field_14_pObj2C->field_4->field_14_xy.x, field_14_pObj2C->field_4->field_14_xy.y, field_14_pObj2C->field_4->field_1C_zpos);
+            gSpriteGrid_3_679210->AddToSingleBucket_477AE0(pParticle->field_30_pNext);
+            this->field_18_particle_cooldown = gRng_6F6784.get_int_4F7AE0(5);
+        }
+    }
+    else
+    {
+        this->field_18_particle_cooldown--;
+    }
 }
 
 MATCH_FUNC(0x540d30)
