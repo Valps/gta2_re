@@ -12,6 +12,7 @@ class File
 
     EXPORT static bool __stdcall IsCdRomDrive_4A6BB0(char_type a1);
 
+    EXPORT static void __stdcall CheckReadOnlyFile_4A6BE0(const char_type* FileName, s32 expectedSize);
     EXPORT static void* __stdcall ReadFileToBuffer_4A6C80(const char_type* FileName, size_t* a2);
 
     EXPORT static size_t __stdcall Read_4A6D90(void* Buffer, size_t ElementSize, size_t ElementCount, FILE* Stream);

@@ -51,6 +51,34 @@ bool __stdcall File::IsCdRomDrive_4A6BB0(char_type driveLetter)
     return false;
 }
 
+// Copy protection: the file must have the expected size and must not be writable (so it is on the CD)
+MATCH_FUNC(0x4A6BE0)
+void __stdcall File::CheckReadOnlyFile_4A6BE0(const char_type* FileName, s32 expectedSize)
+{
+    FILE* hFile = crt::fopen(FileName, "rb");
+    if (!hFile)
+    {
+        FatalError_4A38C0(Gta2Error::SecurityFail, "C:\\Splitting\\Gta2\\Source\\File.cpp", 104);
+    }
+
+    if (GetFileSize_4A6B10(hFile) != expectedSize)
+    {
+        FatalError_4A38C0(Gta2Error::SecurityFail, "C:\\Splitting\\Gta2\\Source\\File.cpp", 108);
+    }
+
+    s32 closeRet = crt::fclose(hFile);
+    gbGlobalFileOpen_67D160 = 0;
+    if (closeRet)
+    {
+        FatalError_4A38C0(Gta2Error::SecurityFail, "C:\\Splitting\\Gta2\\Source\\File.cpp", 113);
+    }
+
+    if (crt::fopen(FileName, "wb"))
+    {
+        FatalError_4A38C0(Gta2Error::SecurityFail, "C:\\Splitting\\Gta2\\Source\\File.cpp", 117);
+    }
+}
+
 MATCH_FUNC(0x4A6C80)
 void* __stdcall File::ReadFileToBuffer_4A6C80(const char_type* FileName, size_t* pAllocatedBufferSize)
 {
