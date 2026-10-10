@@ -104,6 +104,18 @@ s32 __stdcall FreeLoader::GetCityInstalled_4AE0F0()
     return v0;
 }
 
+MATCH_FUNC(0x4AE170)
+void __cdecl FreeLoader::MessageBox_4AE170(UINT uType, LPCSTR lpCaption, LPCSTR lpFormat, ...)
+{
+    char_type Buffer[1024];
+    va_list args;
+    va_start(args, lpFormat);
+    wvsprintfA(Buffer, lpFormat, args);
+    lstrcatA(Buffer, "\r\n");
+    OutputDebugStringA(Buffer);
+    MessageBoxA(0, Buffer, lpCaption, uType);
+}
+
 MATCH_FUNC(0x4AE1F0)
 EXPORT char_type __stdcall FreeLoader::CheckCityInstalled_4AE1F0(u8 a1)
 {
@@ -296,6 +308,12 @@ DEFINE_GLOBAL_ARRAY_INIT(
         "data\\frontend\\Mask.tga" COMMA 104300 COMMA 0} COMMA {"data\\frontend\\Mask2.tga" COMMA 53594 COMMA 0} COMMA {
         "data\\frontend\\Credits.tga" COMMA 614444 COMMA 0} COMMA {"data\\frontend\\Mask3.tga" COMMA 130427 COMMA 0} COMMA {
         "data\\frontend\\DemoInfo.tga" COMMA 614939 COMMA 0});
+
+MATCH_FUNC(0x5D98D0)
+EXPORT s32 IsFullScreen_5D98D0()
+{
+    return gVidSys_7071D0->field_40_full_screen;
+}
 
 // This function matches with the Write_4D9620 call below, but that call (ErrorLog class) crashes the
 // standalone exe on boot. Kept as WIP on purpose (maintainer decision): do not re-enable it to promote.
