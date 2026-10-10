@@ -455,6 +455,9 @@ The move can also fix the order in which globals are reloaded after a call, not 
 width: moving `gBlockLeft_6F62F6`/`gBlockRight_6F63C6` to `map_0x370.cpp` matched all nine
 `MapRenderer::DrawPartialBlock*` functions. Try each global separately: there, moving
 `gBlockTop` changed nothing and moving `gBlockBottom` made it worse.
+A zero-extended `u16` shows it as `mov %ecx, g; and $0xFFFF,%ecx` (definition in view) against the
+original's `xor %ecx,%ecx; mov g,%cx` (`gCdCheckFileCount_6252E0`, defined in `file.cpp` for the
+`CheckCdFile_4B80F0` copies in `Frontend.cpp`).
 
 **`cmp $0xFFFF,%di` with a 16-bit immediate means a `u16` compared with `0xFFFF`.** `s16 x; x != -1`
 encodes the constant as a sign-extended byte (`66 83 ff ff`, 4 bytes); `u16 x; x != 0xFFFF` uses the
