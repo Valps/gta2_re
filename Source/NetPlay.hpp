@@ -37,7 +37,7 @@ class Packet_SubType_3
 {
   public:
     PacketHeader header;
-    char_type field_8_game_tick; // mod 256
+    u8 field_8_game_tick; // mod 256
     s32 field_9;
     s32 field_D;
     s32 field_11_len;
@@ -60,15 +60,25 @@ class Nework_2C
     s32 field_28;
 };
 
+struct Network_Data
+{
+    u8 field_0;
+    u8 field_1_tick;
+    u8 field_2;
+    u8 field_3_type;
+    u8 field_4_length;
+    void* field_5_game_settings;
+};
+
 class Network_Unknown
 {
   public:
     s32 field_0_group_id;
     u32 field_4_count;
-    char_type field_8_packet_game_tick[4]; // game tick mod 256
+    u8 field_8_packet_game_tick[4]; // game tick mod 256
     s32 field_C;
     Nework_2C field_10_players[MAX_PLAYERS];
-    u8* field_118_group_data;
+    u8* field_118_game_settings;
     s32 field_11C_group_data_len;
     DPSESSIONDESC2 field_120_session_desc;
 };
@@ -107,7 +117,7 @@ struct Network_4
 
 struct Network_8
 {
-    void* field_0;
+    void* field_0_data;
     s32 field_4_len;
 };
 
@@ -220,7 +230,7 @@ struct NetPlay
     EXPORT void Set21_5210D0(s32 a2, s32 a3);
     EXPORT void GetPlayerName_521100(wchar_t* Destination, u32 idx);
     EXPORT void Set24_521140(s32 a2, s32 a3);
-    EXPORT s32 SetGroupData_521170(Network_8* a2);
+    EXPORT s32 SetGameSettings_521170(Network_8* a2);
     EXPORT void Set27SavePlayerName_5211F0(s32 a2, s32 a3);
     EXPORT void DisableJoining_521220();
     EXPORT s32 GetField5CC_5212E0();

@@ -11840,7 +11840,7 @@
         "v96f_auto": true
     },
     {
-        "name": "NetPlay::SetGroupData_521170",
+        "name": "NetPlay::SetGameSettings_521170",
         "v96f_address": "0x409e10",
         "v105_address": "0x521170",
         "v96f_auto": true
