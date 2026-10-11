@@ -31,7 +31,7 @@ static inline s32 SeqDiff(u8 a, u8 b)
 // Advances a player's 8-bit sequence number
 static inline void NextSeq(Network_Unknown* pN2, s32 idx)
 {
-    pN2->field_8[idx] = ((u8)pN2->field_8[idx] + 1) % 256;
+    pN2->field_8_packet_game_tick[idx] = ((u8)pN2->field_8_packet_game_tick[idx] + 1) % 256;
 }
 
 MATCH_FUNC(0x51d6b0)
@@ -888,7 +888,7 @@ s32 NetPlay::SendPing_51EF60()
     pStru.header.field_0_type = 1;
     pStru.header.field_4_sub_type = 1;
     pStru.field_9 = 1;
-    pStru.field_8 = 0;
+    pStru.field_8_game_tick = 0;
     pStru.field_D = (s32)&ping;
     pStru.field_11_len = sizeof(ping);
     memset(&ping, 0, sizeof(ping));
@@ -978,7 +978,7 @@ void NetPlay::ProcessPingOrHandshakeSend_51F110(void* pPacket, s32 a3, s32 a4, s
                     pStru.header.field_0_type = 1;
                     pStru.header.field_4_sub_type = 1;
                     pStru.field_9 = 1;
-                    pStru.field_8 = 0;
+                    pStru.field_8_game_tick = 0;
                     pStru.field_D = (s32)pPing;
                     pStru.field_11_len = sizeof(Packet_Ping_C);
                     NetPlay::MakeSendData_51F420(&pStru, &pData, &dataLen);
@@ -1169,11 +1169,11 @@ void NetPlay::MakeSendData_51F420(Packet_SubType_3* pPacket, s32* pData, u32* pD
                     case 3:
                     {
                         s32 idx = GetPlayerIdx_409C40();
-                        if (SeqDiff(pPacket->field_8, byte_6F8A64[idx]) == 1 && dword_6F8A4C[idx] == *(s32*)pPacket->field_D)
+                        if (SeqDiff(pPacket->field_8_game_tick, byte_6F8A64[idx]) == 1 && dword_6F8A4C[idx] == *(s32*)pPacket->field_D)
                         {
-                            byte_6F8A64[idx] = pPacket->field_8;
+                            byte_6F8A64[idx] = pPacket->field_8_game_tick;
                             pBuffer[0] = 9;
-                            pBuffer[1] = pPacket->field_8;
+                            pBuffer[1] = pPacket->field_8_game_tick;
                             *pDataLen = 2;
                             if (bDo_sync_check_67D6C1)
                             {
@@ -1184,14 +1184,14 @@ void NetPlay::MakeSendData_51F420(Packet_SubType_3* pPacket, s32* pData, u32* pD
                         else
                         {
                             pBuffer[0] = 1;
-                            pBuffer[1] = pPacket->field_8;
+                            pBuffer[1] = pPacket->field_8_game_tick;
                             memcpy(pBuffer + 2, (u8*)pPacket->field_D, pPacket->field_11_len);
                             *pDataLen = pPacket->field_11_len + 2;
                             idx = GetPlayerIdx_409C40();
-                            if (SeqDiff(pPacket->field_8, byte_6F8A64[idx]) == 1)
+                            if (SeqDiff(pPacket->field_8_game_tick, byte_6F8A64[idx]) == 1)
                             {
                                 dword_6F8A4C[idx] = *(s32*)pPacket->field_D;
-                                byte_6F8A64[GetPlayerIdx_409C40()] = pPacket->field_8;
+                                byte_6F8A64[GetPlayerIdx_409C40()] = pPacket->field_8_game_tick;
                             }
                         }
                         break;
@@ -1889,7 +1889,7 @@ void NetPlay::DisableJoining_521220()
     Packet_SubType_3 pStru;
 
     memset(&pStru, 0, sizeof(pStru));
-    pStru.field_8 = 0;
+    pStru.field_8_game_tick = 0;
     pStru.field_D = 0;
     pStru.field_11_len = 0;
     pStru.header.field_0_type = 1;
@@ -2028,7 +2028,7 @@ s32 NetPlay::CopyConnection_5215B0(u32 idx, u32* ppConnection, size_t* pLen)
 }
 
 MATCH_FUNC(0x521630)
-s32 NetPlay::SendToPlayer_521630(Network_8* pSendData, s32 idx, char_type a4)
+s32 NetPlay::SendToPlayer_521630(Network_8* pSendData, s32 player_idx, char_type delayed_ticks)
 {
     u32 dataLen;
     s32 pData;
@@ -2041,8 +2041,8 @@ s32 NetPlay::SendToPlayer_521630(Network_8* pSendData, s32 idx, char_type a4)
     pStru.field_D = (s32)pSendData->field_0;
     pStru.field_11_len = pSendData->field_4_len;
     NetPlay::MakeSendData_51F420(&pStru, &pData, &dataLen);
-    ((char_type*)pData)[1] = field_758_n2.field_8[GetPlayerIdx_409C40()] - a4;
-    return field_5E4_pDPlay3->Send(field_5D8_player_id, field_758_n2.field_10_players[idx].field_10_player_id, 0, (void*)pData, dataLen);
+    ((char_type*)pData)[1] = field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()] - delayed_ticks;
+    return field_5E4_pDPlay3->Send(field_5D8_player_id, field_758_n2.field_10_players[player_idx].field_10_player_id, 0, (void*)pData, dataLen);
 }
 
 MATCH_FUNC(0x5216e0)
@@ -2122,7 +2122,7 @@ void NetPlay::sub_521820(s32** a2, s32 idx)
     {
         dword_6F8A4C[idx] = *p;
     }
-    byte_6F8A64[idx] = field_758_n2.field_8[idx];
+    byte_6F8A64[idx] = field_758_n2.field_8_packet_game_tick[idx];
 }
 
 MATCH_FUNC(0x521870)
@@ -2137,7 +2137,7 @@ char_type NetPlay::ReceiveGameMessage_521890(Network_8* pOut, s32* pPlayerIdx, u
 {
     char_type bGotMessage;
     char_type bCheckBuffered;
-    char_type seq;
+    char_type receivedTick;
     s32 pData;
     unsigned long senderId;
     unsigned long recvId;
@@ -2156,20 +2156,24 @@ char_type NetPlay::ReceiveGameMessage_521890(Network_8* pOut, s32* pPlayerIdx, u
         }
 
         u32 slot;
-        if (bCheckBuffered && (slot = sub_521770(pOut, &seq, (u32*)pPlayerIdx)) != -1)
+        if (bCheckBuffered && (slot = sub_521770(pOut, &receivedTick, (u32*)pPlayerIdx)) != -1)
         {
             // The oldest buffered (out of order) packet
             *pType = 3;
             bGotMessage = 1;
-            s32 diff = SeqDiff(seq, field_758_n2.field_8[*pPlayerIdx]);
-            s32 diffLocal = SeqDiff(seq, field_758_n2.field_8[GetPlayerIdx_409C40()]);
+
+            // diff: received player tick - our (buffered?) current stored tick for the same player
+            s32 diff = SeqDiff(receivedTick, field_758_n2.field_8_packet_game_tick[*pPlayerIdx]);
+            s32 diffLocal = SeqDiff(receivedTick, field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()]);
             if (diff < 0)
             {
+                // we received an old packet, so ignore it and clear its slot
                 bGotMessage = 0;
                 Remove_521870(slot);
             }
-            else if (diff <= 0 && diffLocal < 0)
+            else if (diff <= 0 && diffLocal < 0)  // diff == 0 && diffLocal < 0
             {
+                // our buffer matches tick from the player packet, but this tick is older than our user player tick
                 Remove_521870(slot);
                 sub_521820((s32**)pOut, *pPlayerIdx);
                 NextSeq(&field_758_n2, *pPlayerIdx);
@@ -2196,8 +2200,8 @@ char_type NetPlay::ReceiveGameMessage_521890(Network_8* pOut, s32* pPlayerIdx, u
                     pOut->field_0 = (u8*)pData + 5;
                     if (*pType == 3)
                     {
-                        s32 diff = SeqDiff(((u8*)pData)[1], field_758_n2.field_8[*pPlayerIdx]);
-                        s32 diffLocal = SeqDiff(((u8*)pData)[1], field_758_n2.field_8[GetPlayerIdx_409C40()]);
+                        s32 diff = SeqDiff(((u8*)pData)[1], field_758_n2.field_8_packet_game_tick[*pPlayerIdx]);
+                        s32 diffLocal = SeqDiff(((u8*)pData)[1], field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()]);
                         if (diff < 0)
                         {
                             bGotMessage = 0;
@@ -2239,14 +2243,14 @@ void NetPlay::SendToAll_521B20(Network_8* pSendData)
     memset(&pStru, 0, sizeof(pStru));
     pStru.header.field_4_sub_type = 3;
     pStru.header.field_0_type = 1;
-    pStru.field_8 = field_758_n2.field_8[GetPlayerIdx_409C40()];
+    pStru.field_8_game_tick = field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()];
     pStru.field_9 = 1;
     pStru.field_D = (s32)pSendData->field_0;
     pStru.field_11_len = pSendData->field_4_len;
     NetPlay::MakeSendData_51F420(&pStru, &pData, &dataLen);
     field_5E4_pDPlay3->Send(field_5D8_player_id, 0, 0, (void*)pData, dataLen);
     const s32 player_idx = GetPlayerIdx_409C40();
-    field_758_n2.field_8[player_idx] = ((u8)field_758_n2.field_8[player_idx] + 1) % 256;
+    field_758_n2.field_8_packet_game_tick[player_idx] = ((u8)field_758_n2.field_8_packet_game_tick[player_idx] + 1) % 256;
 }
 
 MATCH_FUNC(0x521be0)
@@ -2259,7 +2263,7 @@ s32 NetPlay::NoRefs_Send_521BE0(Network_8* pSendData, s32 a3)
     memset(&pStru, 0, sizeof(pStru));
     pStru.header.field_4_sub_type = 3;
     pStru.header.field_0_type = 1;
-    pStru.field_8 = field_758_n2.field_8[GetPlayerIdx_409C40()] - (char_type)a3;
+    pStru.field_8_game_tick = field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()] - (char_type)a3;
     pStru.field_9 = 1;
     pStru.field_D = (s32)pSendData->field_0;
     pStru.field_11_len = pSendData->field_4_len;
@@ -2281,7 +2285,7 @@ s32 NetPlay::NoRefs_Send_521C80(s32 pSendData)
     pStru.field_D = pSendData;
     pStru.field_11_len = 0xE;
     NetPlay::MakeSendData_51F420(&pStru, &pData, &dataLen);
-    ((char_type*)pData)[1] = field_758_n2.field_8[GetPlayerIdx_409C40()];
+    ((char_type*)pData)[1] = field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()];
     return field_5E4_pDPlay3->Send(field_5D8_player_id, 0, 0, (void*)pData, dataLen);
 }
 

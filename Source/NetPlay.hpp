@@ -37,7 +37,7 @@ class Packet_SubType_3
 {
   public:
     PacketHeader header;
-    char_type field_8;
+    char_type field_8_game_tick; // mod 256
     s32 field_9;
     s32 field_D;
     s32 field_11_len;
@@ -65,7 +65,7 @@ class Network_Unknown
   public:
     s32 field_0_group_id;
     u32 field_4_count;
-    char_type field_8[4];
+    char_type field_8_packet_game_tick[4]; // game tick mod 256
     s32 field_C;
     Nework_2C field_10_players[MAX_PLAYERS];
     u8* field_118_group_data;
@@ -229,7 +229,7 @@ struct NetPlay
     EXPORT void Send_521370();
     EXPORT bool WaitForPlayersSync_5213E0();
     EXPORT s32 CopyConnection_5215B0(u32 a2, u32* a3, size_t* a4);
-    EXPORT s32 SendToPlayer_521630(Network_8* pSendData, s32 idx, char_type a4);
+    EXPORT s32 SendToPlayer_521630(Network_8* pSendData, s32 player_idx, char_type delayed_ticks);
     EXPORT void Add_5216E0(Network_8* pData, s32 id, char_type type);
     EXPORT u32 sub_521770(Network_8* pOut, char_type* pSeq, u32* pPlayerId);
     EXPORT void sub_521820(s32** a2, s32 idx);

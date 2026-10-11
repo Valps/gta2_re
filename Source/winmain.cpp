@@ -1041,11 +1041,11 @@ u8 gNetPlayerDropped_6F8470[6];//DEFINE_GLOBAL_ARRAY(u8, gNetPlayerDropped_6F847
 
 // Re-sends our inputs of a previous frame to one player.
 MATCH_FUNC(0x4DA9B0)
-EXPORT void __stdcall Net_4DA9B0(Network_InputData_0x8* pInputs, s32 type, u8 player_idx)
+EXPORT void __stdcall Net_4DA9B0(Network_InputData_0x8* pInputs, s32 delayed_ticks, u8 player_idx)
 {
     gInputSendData_6F5B18.field_0 = pInputs;
     gInputSendData_6F5B18.field_4_len = bDo_sync_check_67D6C1 ? sizeof(Network_InputData_0x8) : sizeof(u32);
-    gNetPlay_7071E8.SendToPlayer_521630(&gInputSendData_6F5B18, player_idx, type);
+    gNetPlay_7071E8.SendToPlayer_521630(&gInputSendData_6F5B18, player_idx, delayed_ticks);
 }
 
 MATCH_FUNC(0x4DA9F0)
