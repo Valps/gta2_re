@@ -7325,13 +7325,21 @@ void TrafficSpawner::GenerateTraffic_583670()
         field_C_player = gGame_0x40_67E008->IterateFirstPlayer_4B9CD0();
         if (field_C_player)
         {
-            field_10_zone = gMap_0x370_6F6268->GetZoneInfoAt_4DF890(field_C_player->field_2C4_player_ped->get_cam_x().ToInt(),
+            if (!field_C_player->bIsSpectator)
+            {
+                field_10_zone = gMap_0x370_6F6268->GetZoneInfoAt_4DF890(field_C_player->field_2C4_player_ped->get_cam_x().ToInt(),
                                                                            field_C_player->field_2C4_player_ped->field_1AC_cam.y.ToInt());
+            }
+            else
+            {
+                field_10_zone = gMap_0x370_6F6268->GetZoneInfoAt_4DF890(field_C_player->field_14C_view_camera.field_10_pending_target_pos.field_0_x.ToInt(),
+                                                                            field_C_player->field_14C_view_camera.field_10_pending_target_pos.field_4_y.ToInt());
+            }
         }
 
         while (field_0_cam)
         {
-            if (field_0_cam->HasFollowTarget_433E90())
+            if (field_0_cam->HasFollowTarget_433E90() || (field_C_player->bIsSpectator && !bStartNetworkGame_7081F0))
             {
                 TrafficSpawner::MakeTrafficForCurrCamera_5832C0();
             }
