@@ -328,6 +328,11 @@ void Game::BootGame_4B8EB0()
     }
 
     gPlyDat_6FEAC0->DoMuchCashCheat_56C250();
+
+    if (gSpectator && !bStartNetworkGame_7081F0)
+    {
+        gGame_0x40_67E008->field_38_local_player->ConvertUserPlayerToSpectator();
+    }
 }
 
 MATCH_FUNC(0x4B8FF0)
