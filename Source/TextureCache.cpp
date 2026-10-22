@@ -187,7 +187,7 @@ void TextureCache::ReadTextures_5B92E0()
     {
         field_1001_bFreeTileTextures = 1;
         STexture** p = field_0_tile_textures;
-        for (u16 i = 0; i < GTA2_COUNTOF(field_0_tile_textures); i++, p++)
+        for (u16 i = 0; i < 992; i++, p++) // GTA2_COUNTOF(field_0_tile_textures)
         {
             // 64 256x256 pages of 64x64 8 bit tiles
             *p = pgbh_RegisterTexture(64, 64, gGtx_0x106C_703DD4->get_tile_4C2EB0(i), gGtx_0x106C_703DD4->get_phys_pal_5AA6F0(i), 0);
