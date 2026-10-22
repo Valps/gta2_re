@@ -97,3 +97,5 @@ EXTERN_GLOBAL(bool, bShow_all_arrows_67D6E7);
 EXTERN_GLOBAL(bool, bDo_kill_phones_on_answer_67D6E8);
 EXTERN_GLOBAL(bool, byte_67D654);
 EXTERN_GLOBAL(bool, byte_67D56B);
+
+extern bool gSpectator;
