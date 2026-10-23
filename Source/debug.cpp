@@ -172,7 +172,7 @@ void Debug::Init_4ABBD0()
     bIsFrench_67D53C = HaveOnlyFrenchGtx_4AC200();
     bShow_player_names_67D54C = gRegistry_6FF968.Get_Network_Setting_587690("show_player_names", 1) != 0;
 
-    gSpectator = true;
+    gSpectator = false;
 }
 
 MATCH_FUNC(0x4AC200)
