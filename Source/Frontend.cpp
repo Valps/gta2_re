@@ -778,6 +778,18 @@ void Frontend::GetOptionText_4B3AF0(u16 menu_page_idx, u16 option_idx, wchar_t**
     {
         swprintf(gTmpWideStr_67C7D8, L"%s", gText_0x14_704DFC->Find_5B5F90("hi_for"));
     }
+    else if (menu_page_idx == MENUPAGE_OPTIONS_16 && option_idx == 0)
+    {
+        if (pOption->field_6E_horizontal_selected_idx == 0)
+        {
+            swprintf(tmpBuff_67BD9C, L"OFF");
+        }
+        else
+        {
+            swprintf(tmpBuff_67BD9C, L"ON");
+        }
+        swprintf(gTmpWideStr_67C7D8, L"%s %s", pOption->field_6_option_name_str, tmpBuff_67BD9C);
+    }
     else
     {
         swprintf(tmpBuff_67BD9C, L"%d", pOption->field_6E_horizontal_selected_idx);
