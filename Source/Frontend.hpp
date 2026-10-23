@@ -202,6 +202,7 @@ enum MenuPages // enum for field_132_f136_idx
     MENUPAGE_13 = 13,
     MENUPAGE_PARENTAL_CONTROL = 14,
     MENUPAGE_15 = 15,
+    MENUPAGE_OPTIONS_16 = 16,
     NUM_MENUPAGES,
 
     // Not really pages
@@ -256,7 +257,7 @@ struct Frontend
     s16 field_130_title_font;
     u16 field_132_f136_idx;
     s16 field_134_unused;
-    MenuPage field_136_menu_pages_array[17];
+    MenuPage field_136_menu_pages_array[20];
     wchar_t field_C9A0_curr_plyr_name[9];
     u8 field_C9B2_curr_plyr_name_length;
     char_type field_C9B3_key_held;
