@@ -287,6 +287,9 @@ class Player
     EXPORT void ApplyCheats_56A490();
     EXPORT void ClearInputs_56A6D0();
 
+    void ConvertUserPlayerToSpectator();
+    void SpectatorService();
+
     // 0x56A740
     EXPORT Player(u8 player_idx);
 
@@ -454,6 +457,7 @@ class Player
     s32 field_834_unused;
     s32 field_838_chat_text_idx;
     wchar_t field_83C_player_name[16];
+    bool bIsSpectator;
 };
 
 // 9.6f 0x434B60

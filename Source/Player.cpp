@@ -1173,13 +1173,13 @@ void Player::Hud_Controls_565890(u16 action)
                 break;
 
             case DIK_4:
-                if (bDo_debug_keys_67D6CF)
+                if (bDo_debug_keys_67D6CF && !bIsSpectator)
                 {
                     Player::IncreaseWantedLevelFromDebugKeys_565860();
                 }
                 break;
             case DIK_5:
-                if (bDo_debug_keys_67D6CF)
+                if (bDo_debug_keys_67D6CF && !bIsSpectator)
                 {
                     if (field_2C4_player_ped)
                     {
@@ -1976,22 +1976,48 @@ MATCH_FUNC(0x5686D0)
 void Player::UpdateCamera_5686D0(Camera* pCam)
 {
     // Camera panning
-    if (this->field_82_now_special_2_pressed)
+    if (!gSpectator)
     {
-        pCam->HandlePanning_436710(this->field_78_now_forward_pressed,
-                                   this->field_79_now_down_pressed,
-                                   this->field_7A_now_left_pressed,
-                                   this->field_7B_now_right_pressed);
-        this->field_7A_now_left_pressed = 0;
-        this->field_7B_now_right_pressed = 0;
-        this->field_78_now_forward_pressed = 0;
-        this->field_79_now_down_pressed = 0;
-        this->field_8B_forward_changed = 0;
-        this->field_8C_down_changed = 0;
+        if (this->field_82_now_special_2_pressed)
+        {
+            pCam->HandlePanning_436710(this->field_78_now_forward_pressed,
+                                    this->field_79_now_down_pressed,
+                                    this->field_7A_now_left_pressed,
+                                    this->field_7B_now_right_pressed);
+            this->field_7A_now_left_pressed = 0;
+            this->field_7B_now_right_pressed = 0;
+            this->field_78_now_forward_pressed = 0;
+            this->field_79_now_down_pressed = 0;
+            this->field_8B_forward_changed = 0;
+            this->field_8C_down_changed = 0;
+        }
+        else
+        {
+            pCam->ResetPanning_436830();
+        }
     }
     else
     {
-        pCam->ResetPanning_436830();
+        if (field_78_now_forward_pressed || field_79_now_down_pressed || field_7A_now_left_pressed || field_7B_now_right_pressed)
+        {
+            pCam->HandleSpectatorCam(this->field_78_now_forward_pressed,
+                                        this->field_79_now_down_pressed,
+                                        this->field_7A_now_left_pressed,
+                                        this->field_7B_now_right_pressed);
+
+            this->field_7A_now_left_pressed = 0;
+            this->field_7B_now_right_pressed = 0;
+            this->field_78_now_forward_pressed = 0;
+            this->field_79_now_down_pressed = 0;
+            this->field_8B_forward_changed = 0;
+            this->field_8C_down_changed = 0;
+        }
+        else
+        {
+            pCam->ResetPanning_436830();
+            pCam->StopSpectatorCam();
+            //pCam->ClampTargetZ_435840();
+        }
     }
 }
 
@@ -2011,9 +2037,174 @@ void Player::Disconnect_568730()
     set_in_use_4A5170(0);
 }
 
+void Player::ConvertUserPlayerToSpectator()
+{
+    if (gGame_0x40_67E008->field_24_local_player_idx == GetIdx_4881E0())
+    {
+        Ped* pPlayerPed = field_2C4_player_ped;
+        if (pPlayerPed)
+        {
+            pPlayerPed->BecomeDummyOnPlayerDisconnect_470300();
+        }
+        Ped* pPed = field_2C8_aux_ped;
+        if (pPed)
+        {
+            pPed->BecomeDummyOnPlayerDisconnect_470300();
+        }
+    }
+    field_14C_view_camera.spectator_player = this;
+    field_14C_view_camera.field_34_target_ped = 0;
+    field_14C_view_camera.field_38_target_car = 0;
+    
+    field_90_game_camera.spectator_player = this;
+    field_90_game_camera.field_34_target_ped = 0;
+    field_90_game_camera.field_38_target_car = 0;
+
+    field_2C4_player_ped = NULL;
+
+    bIsSpectator = true;
+}
+
+void Player::SpectatorService()
+{
+    const bool bNowEnterExitPressed = this->field_7D_now_enter_exit_pressed;
+    const bool bWasEnterExitPressed = this->field_89_enter_exit_changed;
+    const bool bNowSpecial_1_Pressed = this->field_81_now_special_1_pressed;
+    const bool bWasSpecial_1_Pressed = this->field_84_special_1_changed;
+
+    if (field_680_traffic_spawn_counter < 100 && !bStartNetworkGame_7081F0)
+    {
+        this->field_680_traffic_spawn_counter++;
+    }
+
+    if (bDo_debug_keys_67D6CF)
+    {
+        Player::HandleDebugZoom_568670();
+    }
+
+    switch (this->field_68_camera_mode)
+    {
+        case 1:
+            field_90_game_camera.MoveTarget_435D20(this->field_78_now_forward_pressed,
+                                            this->field_79_now_down_pressed,
+                                            this->field_7A_now_left_pressed,
+                                            this->field_7B_now_right_pressed,
+                                            this->field_7F_now_prev_weapon_pressed,
+                                            this->field_80_now_next_weapon_pressed);
+            field_90_game_camera.Update_435FF0();
+            if (!this->field_6C_in_debug_cam_mode)
+            {
+                memcpy(&this->field_14C_view_camera, &field_90_game_camera, sizeof(this->field_14C_view_camera));
+            }
+            break;
+
+        case 0:
+            Player::UpdateCamera_5686D0(&this->field_90_game_camera);
+
+            field_90_game_camera.UpdateFollowPedCamera_436540(NULL);
+            field_90_game_camera.Update_435FF0();
+
+            if (this->field_2D0_aux_cam_active)
+            {
+                if (this->field_2C8_aux_ped)
+                {
+                    field_208_aux_game_camera.UpdateFollowPedCamera_436540(this->field_2C8_aux_ped);
+                }
+                else if (this->field_2CC_watched_car)
+                {
+                    field_208_aux_game_camera.UpdateFollowCarCamera_4364A0(this->field_2CC_watched_car);
+                }
+                field_208_aux_game_camera.Update_435FF0();
+            }
+
+            if (!this->field_6C_in_debug_cam_mode)
+            {
+                memcpy(&this->field_14C_view_camera, &field_90_game_camera, sizeof(this->field_14C_view_camera));
+            }
+            break;
+
+        case 2:
+            this->field_7D_now_enter_exit_pressed = 0;
+            this->field_89_enter_exit_changed = 0;
+
+            Player::UpdateCamera_5686D0(&this->field_208_aux_game_camera);
+
+            if (this->field_2C8_aux_ped)
+            {
+                if (!this->field_2F_disable_all_controls)
+                {
+                    Player::HandleControls_5668D0(this->field_2C8_aux_ped);
+                }
+                field_208_aux_game_camera.UpdateFollowPedCamera_436540(this->field_2C8_aux_ped);
+            }
+            field_90_game_camera.UpdateFollowPedCamera_436540(NULL);
+            field_90_game_camera.Update_435FF0();
+            field_208_aux_game_camera.Update_435FF0();
+            if (!this->field_6C_in_debug_cam_mode)
+            {
+                memcpy(&this->field_14C_view_camera, &field_208_aux_game_camera, sizeof(this->field_14C_view_camera));
+            }
+            break;
+
+        case 3:
+            field_90_game_camera.UpdateFollowPedCamera_436540(NULL);
+            if (this->field_2C8_aux_ped)
+            {
+                field_208_aux_game_camera.UpdateFollowPedCamera_436540(this->field_2C8_aux_ped);
+            }
+            else if (this->field_2CC_watched_car)
+            {
+                field_208_aux_game_camera.UpdateFollowCarCamera_4364A0(this->field_2CC_watched_car);
+            }
+            field_90_game_camera.Update_435FF0();
+            field_208_aux_game_camera.Update_435FF0();
+            if (!this->field_6C_in_debug_cam_mode)
+            {
+                memcpy(&this->field_14C_view_camera, &field_208_aux_game_camera, sizeof(this->field_14C_view_camera));
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    if (this->field_6C_in_debug_cam_mode == 1)
+    {
+        this->field_14C_view_camera.SetSnapFollow_4A5070();
+
+        field_14C_view_camera.MoveTarget_435D20(this->field_70_dbg_cam_north,
+                                         this->field_71_dbg_cam_south,
+                                         this->field_72_dbg_cam_west,
+                                         this->field_73_dbg_cam_east,
+                                         this->field_74_dbg_cam_zooming_out,
+                                         this->field_75_dbg_cam_zooming_in);
+        /*                                 
+        if (this->field_48_dbg_cam_follow_player)
+        {
+            field_14C_view_camera.ApplyMovementDeltaFrom_435860(&this->field_90_game_camera);
+        }
+        */
+        field_14C_view_camera.Update_435FF0();
+    }
+
+    Player::UpdateSoundListener_568630();
+
+    this->field_7D_now_enter_exit_pressed = bNowEnterExitPressed;
+    this->field_89_enter_exit_changed = bWasEnterExitPressed;
+    this->field_81_now_special_1_pressed = bNowSpecial_1_Pressed;
+    this->field_84_special_1_changed = bWasSpecial_1_Pressed;
+    //Player::SetScoreTextColour_569C20();
+}
+
 MATCH_FUNC(0x5687F0)
 void Player::Service_5687F0()
 {
+    if (bIsSpectator)
+    {
+        SpectatorService();
+        return;
+    }
+
     const bool bNowEnterExitPressed = this->field_7D_now_enter_exit_pressed;
     const bool bWasEnterExitPressed = this->field_89_enter_exit_changed;
     const bool bNowSpecial_1_Pressed = this->field_81_now_special_1_pressed;
@@ -2966,6 +3157,7 @@ Player::Player(u8 player_idx)
     SetDeathType_434950(0);
     field_83C_player_name[0] = 0;
     field_78A_show_quit_message = 0;
+    bIsSpectator = false;
 }
 
 MATCH_FUNC(0x56A940)
