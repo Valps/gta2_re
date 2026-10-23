@@ -1749,6 +1749,10 @@ void Frontend::UpdateMenuScreen_4B6780()
         {
             field_EE08_menu_screen = Credits_17;
         }
+        else if (field_132_f136_idx == MENUPAGE_OPTIONS_16)
+        {
+            field_EE08_menu_screen = Options_0;
+        }
         else
         {
             field_EE08_menu_screen = PlayArea1_7;
