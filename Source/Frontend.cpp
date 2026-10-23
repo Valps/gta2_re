@@ -1965,6 +1965,7 @@ void Frontend::UpdatePageFromUserInput_4AE2D0()
             case MENUPAGE_BONUS_AREA:
             case MENUPAGE_NICE_TRY:
             case MENUPAGE_RESULTS_PLAYER_QUIT:
+            case MENUPAGE_OPTIONS_16:
                 ChangeMenuPage_4B3170(MENUPAGE_START_MENU);
                 break;
             case MENUPAGE_VIEW_HIGH_SCORE:
