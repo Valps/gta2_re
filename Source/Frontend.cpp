@@ -2014,6 +2014,15 @@ void Frontend::UpdatePageFromUserInput_4AE2D0()
                     snd1_67D818.field_0_object_type = 3;
                 }
             }
+
+            if (field_132_f136_idx == MENUPAGE_OPTIONS_16)
+            {
+                gSpectator = false;
+                if (bWrapped_prev)
+                {
+                    snd1_67D818.field_0_object_type = 3;
+                }
+            }
             pMenuPage = pMenuPageSaved;
         }
         else if (field_132_f136_idx == MENUPAGE_PLAY)
@@ -2051,6 +2060,15 @@ void Frontend::UpdatePageFromUserInput_4AE2D0()
             if (field_132_f136_idx == MENUPAGE_VIEW_HIGH_SCORE && !pMenuPageSaved->field_BC6_current_option_idx)
             {
                 field_EE0D_hiscore_table_idx = pOption_next->field_6E_horizontal_selected_idx;
+                if (bWrapped_next)
+                {
+                    snd1_67D818.field_0_object_type = 4;
+                }
+            }
+
+            if (field_132_f136_idx == MENUPAGE_OPTIONS_16)
+            {
+                gSpectator = true;
                 if (bWrapped_next)
                 {
                     snd1_67D818.field_0_object_type = 4;
