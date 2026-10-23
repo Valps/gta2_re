@@ -98,6 +98,8 @@ DEFINE_GLOBAL_INIT(Ang16, gSpawnRotationBottom_678540, Ang16(720), 0x678540);
 DEFINE_GLOBAL_INIT(s16, gSpawnCounter_6787C6, 0, 0x6787C6);
 EXTERN_GLOBAL(u8, gNumberArmedGangMembers_6787CE);
 
+EXTERN_GLOBAL(s32, bStartNetworkGame_7081F0);
+
 EXPORT Ped* __stdcall SpawnPedChainGroupAt_46DB90(char_type remap, u8 number_followers, Fix16 xpos, Fix16 ypos, Fix16 zpos);
 
 MATCH_FUNC(0x46DB90)
@@ -612,7 +614,10 @@ void PedManager::Dummies_470330()
                 }
             }
             // Use global instance even tho we're already in an instance method :)
-            gPedManager_6787BC->SpawnDummies_46EB60(pCam);
+            if (!pCam->spectator_player || !bStartNetworkGame_7081F0)
+            {
+                gPedManager_6787BC->SpawnDummies_46EB60(pCam);
+            }
         }
     }
 }
