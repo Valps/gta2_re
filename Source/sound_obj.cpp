@@ -5996,6 +5996,11 @@ void sound_obj::ResetRadioMessageState_426750()
 MATCH_FUNC(0x426790)
 void sound_obj::PoliceRadioMessageGeneration_426790()
 {
+    if (gGame_0x40_67E008->field_38_local_player->bIsSpectator)
+    {
+        return;
+    }
+    
     Ped* pPed = gGame_0x40_67E008->field_38_local_player->GetPlayerPed_41D020();
     s32 crime_type;
     Fix16 crime_x;

@@ -69,6 +69,10 @@ PlayerScoreTracker::PlayerScoreTracker()
 MATCH_FUNC(0x591c70)
 void PlayerScoreTracker::Service_591C70()
 {
+    if (field_368_player->bIsSpectator)
+    {
+        return;
+    }
     field_1A8_bonuses.Service_431E30();
     Ped* player_ped = field_368_player->GetPlayerPed_41D020();
     field_18C_one_second_timer_ms += gGame_0x40_67E008->GetFrameDurationMs_4B8BB0();
