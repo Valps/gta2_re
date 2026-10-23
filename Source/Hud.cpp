@@ -3414,7 +3414,8 @@ void Hud::DrawGui_5D6860()
         }
         else
         {
-
+            field_2A25_chat_input.DrawChatMessages_5D16B0();
+            field_12EC_quit_message.DrawQuitMessage_5D1430();
         }
     }
 }
@@ -3444,6 +3445,10 @@ void Hud::UpdateHUD_5D69D0()
         field_107C_gang_respect_bars.Empty_5CFE20();
         field_111C_message.DecrementTimeToShow_5D1AB0();
         field_12F0_mp_message.DecrementTimer_5D5760();
+    }
+    else
+    {
+
     }
 }
 
