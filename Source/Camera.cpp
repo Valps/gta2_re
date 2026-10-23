@@ -672,15 +672,6 @@ void Camera::StopSpectatorCam()
     field_10_pending_target_pos.field_0_x = field_98_cur_pos.field_0_x;
     field_10_pending_target_pos.field_4_y = field_98_cur_pos.field_4_y;
     field_10_pending_target_pos.field_C_zoom = kDefaultZoom_6766D4;
-    field_0_target_pos.field_0_x = field_98_cur_pos.field_0_x;
-    field_0_target_pos.field_C_zoom = kDefaultZoom_6766D4;
-    */
-      // Fix infinite zoom in/out
-    SetPendingTarget_41E3D0(field_98_cur_pos.field_0_x,
-        field_98_cur_pos.field_4_y,
-        kDefaultZoom_6766D4
-    );
-    
 }
 
 void Camera::HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_on, char_type left_on, char_type right_on)
