@@ -1695,6 +1695,8 @@ void CC ImGuiDebugDraw()
                             ImGui::Value("GameCam Z", game_camera->field_98_cur_pos.field_8_z.mValue);
                             ImGui::Value("GameCam PenTarget Z", game_camera->field_10_pending_target_pos.field_8_z.mValue);
                             ImGui::Value("GameCam Target Z", game_camera->field_0_target_pos.field_8_z.mValue);
+                            ImGui::Value("GameCam Target Elevation", game_camera->field_40_target_elevation.mValue);
+                            
                             //ImGui::SliderInt("field_A4", &game_camera->field_98_cur_pos.field_C_zoom.mValue, 0, 25000);
                         }
 
@@ -1703,6 +1705,7 @@ void CC ImGuiDebugDraw()
                             ImGui::Value("ViewCam Z", view_camera->field_98_cur_pos.field_8_z.mValue);
                             ImGui::Value("ViewCam PenTarget Z", view_camera->field_10_pending_target_pos.field_8_z.mValue);
                             ImGui::Value("ViewCam Target Z", view_camera->field_0_target_pos.field_8_z.mValue);
+                            ImGui::Value("ViewCam Target Elevation", view_camera->field_40_target_elevation.mValue);
                             //ImGui::SliderInt("field_A4", &game_camera->field_98_cur_pos.field_C_zoom.mValue, 0, 25000);
                         }
                     }

@@ -2085,6 +2085,7 @@ void Player::SpectatorService()
     switch (this->field_68_camera_mode)
     {
         case 1:
+            /*
             field_90_game_camera.MoveTarget_435D20(this->field_78_now_forward_pressed,
                                             this->field_79_now_down_pressed,
                                             this->field_7A_now_left_pressed,
@@ -2096,6 +2097,7 @@ void Player::SpectatorService()
             {
                 memcpy(&this->field_14C_view_camera, &field_90_game_camera, sizeof(this->field_14C_view_camera));
             }
+            */
             break;
 
         case 0:
@@ -2124,6 +2126,7 @@ void Player::SpectatorService()
             break;
 
         case 2:
+            /*
             this->field_7D_now_enter_exit_pressed = 0;
             this->field_89_enter_exit_changed = 0;
 
@@ -2144,9 +2147,11 @@ void Player::SpectatorService()
             {
                 memcpy(&this->field_14C_view_camera, &field_208_aux_game_camera, sizeof(this->field_14C_view_camera));
             }
+            */
             break;
 
         case 3:
+            /*
             field_90_game_camera.UpdateFollowPedCamera_436540(NULL);
             if (this->field_2C8_aux_ped)
             {
@@ -2162,6 +2167,7 @@ void Player::SpectatorService()
             {
                 memcpy(&this->field_14C_view_camera, &field_208_aux_game_camera, sizeof(this->field_14C_view_camera));
             }
+            */
             break;
 
         default:
