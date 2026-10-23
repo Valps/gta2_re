@@ -3390,25 +3390,32 @@ void Hud::DrawGui_5D6860()
 {
     if (!bSkip_user_67D506)
     {
-        SetFullAmbient_5D6A70();
-        field_1118_player_stats.DrawPlayerStats_5D5C80();
-        field_110C_under_roof_arrow_marker.Draw_5CF910();
-        field_13C0_player_names.DrawPlayerNames_5CFE40();
-        field_1028_wanted_level.DrawWantedLevel_5D0110();
-        field_107C_gang_respect_bars.DrawGangRespectBars_5CFA70();
-        field_1108_health.DrawHealth_5D0260();
-        field_4C_zone_name.DrawZoneName_5D5900();
-        field_0_car_name.DrawCarName_5D4A10();
-        field_1080_pickup_text.Draw_5D5420();
-        field_DC_brief.DrawBrief_5D3B80();
-        field_620_pagers.DrawPagers_5D3040();
-        field_650_texts.Service_5D2010();
-        field_1F18_arrows.DrawArrows_5D0E90();
-        field_12F0_mp_message.Draw_5D56D0();
-        field_111C_message.DrawMessage_5D1940();
-        field_12E4_pause_screen.DrawPause_5D63B0();
-        field_2A25_chat_input.DrawChatMessages_5D16B0();
-        field_12EC_quit_message.DrawQuitMessage_5D1430();
+        if (!gSpectator)
+        {
+            SetFullAmbient_5D6A70();
+            field_1118_player_stats.DrawPlayerStats_5D5C80();
+            field_110C_under_roof_arrow_marker.Draw_5CF910();
+            field_13C0_player_names.DrawPlayerNames_5CFE40();
+            field_1028_wanted_level.DrawWantedLevel_5D0110();
+            field_107C_gang_respect_bars.DrawGangRespectBars_5CFA70();
+            field_1108_health.DrawHealth_5D0260();
+            field_4C_zone_name.DrawZoneName_5D5900();
+            field_0_car_name.DrawCarName_5D4A10();
+            field_1080_pickup_text.Draw_5D5420();
+            field_DC_brief.DrawBrief_5D3B80();
+            field_620_pagers.DrawPagers_5D3040();
+            field_650_texts.Service_5D2010();
+            field_1F18_arrows.DrawArrows_5D0E90();
+            field_12F0_mp_message.Draw_5D56D0();
+            field_111C_message.DrawMessage_5D1940();
+            field_12E4_pause_screen.DrawPause_5D63B0();
+            field_2A25_chat_input.DrawChatMessages_5D16B0();
+            field_12EC_quit_message.DrawQuitMessage_5D1430();
+        }
+        else
+        {
+
+        }
     }
 }
 
@@ -3421,20 +3428,23 @@ void Hud::UpdatePauseSection_5D69C0()
 MATCH_FUNC(0x5d69d0)
 void Hud::UpdateHUD_5D69D0()
 {
-    field_1118_player_stats.UpdateRollingDigits_5D6290();
-    field_110C_under_roof_arrow_marker.Update_5CF730();
-    field_27B5_show_coords.ShowPlayerCoords_5CF970();
-    field_1028_wanted_level.UpdateWantedLevel_5D00B0();
-    UpdateCarName_5D5350();
-    field_1080_pickup_text.DecrementTimer_5D5690();
-    field_4C_zone_name.UpdateZoneName_5D5B60();
-    field_DC_brief.UpdateBrief_5D44D0();
-    field_620_pagers.UpdatePagers_5D31B0();
-    field_650_texts.RemoveExpired_5D2050();
-    field_1F18_arrows.UpdateArrows_5D0FD0();
-    field_107C_gang_respect_bars.Empty_5CFE20();
-    field_111C_message.DecrementTimeToShow_5D1AB0();
-    field_12F0_mp_message.DecrementTimer_5D5760();
+    if (!gSpectator)
+    {
+        field_1118_player_stats.UpdateRollingDigits_5D6290();
+        field_110C_under_roof_arrow_marker.Update_5CF730();
+        field_27B5_show_coords.ShowPlayerCoords_5CF970();
+        field_1028_wanted_level.UpdateWantedLevel_5D00B0();
+        UpdateCarName_5D5350();
+        field_1080_pickup_text.DecrementTimer_5D5690();
+        field_4C_zone_name.UpdateZoneName_5D5B60();
+        field_DC_brief.UpdateBrief_5D44D0();
+        field_620_pagers.UpdatePagers_5D31B0();
+        field_650_texts.RemoveExpired_5D2050();
+        field_1F18_arrows.UpdateArrows_5D0FD0();
+        field_107C_gang_respect_bars.Empty_5CFE20();
+        field_111C_message.DecrementTimeToShow_5D1AB0();
+        field_12F0_mp_message.DecrementTimer_5D5760();
+    }
 }
 
 MATCH_FUNC(0x5d6a70)
@@ -3502,9 +3512,13 @@ void Hud::Init_5D6BE0()
 {
     GetTextSpeed_5D6A90();
     SetFontTypes_5D6B00();
-    field_4C_zone_name.ResetTransparency_5D5C50();
-    field_107C_gang_respect_bars.Empty_5CFE30();
-    field_1028_wanted_level.Init_5D0210();
+    if (!gSpectator)
+    {
+        field_4C_zone_name.ResetTransparency_5D5C50();
+        field_107C_gang_respect_bars.Empty_5CFE30();
+        field_1028_wanted_level.Init_5D0210();
+    }
+    
     field_1F18_arrows.CreatePlayerArrows_5D1350();
 }
 
