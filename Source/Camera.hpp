@@ -7,6 +7,7 @@
 class Sprite;
 class Car;
 class Ped;
+class Player;
 
 EXTERN_GLOBAL(Fix16, kFpEight_676840);
 
@@ -82,6 +83,10 @@ class Camera
     EXPORT ~Camera(); // empty 4369E0
     EXPORT void SetTarget_4397D0(Fix16 x, Fix16 y, Fix16 z, Fix16 zoom);
     EXPORT bool IsPointInBoundaries_58CF10(Fix16 x, Fix16 y);
+
+    void HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_on, char_type left_on, char_type right_on);
+    void ApplySpectatorPanOffset(Fix16& x_pos, Fix16& y_pos, Fix16 z_pos);
+    void StopSpectatorCam();
 
     void ProjectWorldToScreen_4B90E0(Fix16 x, Fix16 y, Fix16 z, Fix16* pOutX, Fix16* pOutY)
     {
@@ -213,6 +218,7 @@ class Camera
     CameraPos field_98_cur_pos;
     Fix16 field_A8_ui_scale;
     CameraPos field_AC_cam_velocity;
+    Player* spectator_player;
 };
 GTA2_ASSERT_SIZEOF_ALWAYS(Camera, 0xBC)
 

@@ -651,6 +651,99 @@ void Camera::UpdateFollowPedCamera_436540(Ped* pPed)
         Camera::ApplyPanOffset_436860(pPed, xpos, ypos, zposToUse);
         SetPendingTarget_41E3D0(xpos, ypos, zposToUse, zoom);
     }
+    else if (spectator_player)
+    {
+        Fix16 xpos = field_10_pending_target_pos.field_0_x;
+        Fix16 ypos = field_10_pending_target_pos.field_4_y;
+        Fix16 zpos = field_10_pending_target_pos.field_8_z;
+        Camera::ApplySpectatorPanOffset(xpos, ypos, zpos);
+        SetPendingTarget_41E3D0(xpos, ypos, zpos, kDefaultZoom_6766D4);
+    }
+}
+
+void Camera::StopSpectatorCam()
+{
+    /*
+    field_10_pending_target_pos.field_0_x = field_98_cur_pos.field_0_x;
+    field_10_pending_target_pos.field_4_y = field_98_cur_pos.field_4_y;
+    field_10_pending_target_pos.field_8_z = field_98_cur_pos.field_8_z;
+    field_10_pending_target_pos.field_C_zoom = kDefaultZoom_6766D4;
+    
+    field_0_target_pos.field_0_x = field_98_cur_pos.field_0_x;
+    field_0_target_pos.field_4_y = field_98_cur_pos.field_4_y;
+    field_0_target_pos.field_8_z = field_98_cur_pos.field_8_z;
+    field_0_target_pos.field_C_zoom = kDefaultZoom_6766D4;
+    */
+      // Fix infinite zoom in/out
+    SetPendingTarget_41E3D0(field_98_cur_pos.field_0_x,
+        field_98_cur_pos.field_4_y,
+        field_98_cur_pos.field_8_z,
+        kDefaultZoom_6766D4
+    );
+    
+}
+
+void Camera::HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_on, char_type left_on, char_type right_on)
+{
+    if (forward_gas_on)
+    {
+        field_4C_pan_y -= field_50_pan_speed_up;
+
+        field_50_pan_speed_up += kPanAcceleration_676910;
+        if (field_50_pan_speed_up > kMaxPanSpeed_676608)
+        {
+            field_50_pan_speed_up = kMaxPanSpeed_676608;
+        }
+    }
+    else
+    {
+        field_50_pan_speed_up = kInitialPanSpeed_6766E4;
+    }
+
+    if (foot_brake_on)
+    {
+        field_4C_pan_y += field_54_pan_speed_down;
+
+        field_54_pan_speed_down += kPanAcceleration_676910;
+        if (field_54_pan_speed_down > kMaxPanSpeed_676608)
+        {
+            field_54_pan_speed_down = kMaxPanSpeed_676608;
+        }
+    }
+    else
+    {
+        field_54_pan_speed_down = kInitialPanSpeed_6766E4;
+    }
+
+    if (left_on)
+    {
+        field_48_pan_x -= field_58_pan_speed_left;
+
+        field_58_pan_speed_left += kPanAcceleration_676910;
+        if (field_58_pan_speed_left > kMaxPanSpeed_676608)
+        {
+            field_58_pan_speed_left = kMaxPanSpeed_676608;
+        }
+    }
+    else
+    {
+        field_58_pan_speed_left = kInitialPanSpeed_6766E4;
+    }
+
+    if (right_on)
+    {
+        field_48_pan_x += field_5C_pan_speed_right;
+
+        field_5C_pan_speed_right += kPanAcceleration_676910;
+        if (field_5C_pan_speed_right > kMaxPanSpeed_676608)
+        {
+            field_5C_pan_speed_right = kMaxPanSpeed_676608;
+        }
+    }
+    else
+    {
+        field_5C_pan_speed_right = kInitialPanSpeed_6766E4;
+    }
 }
 
 MATCH_FUNC(0x436710)
@@ -752,6 +845,13 @@ void Camera::ApplyPanOffset_436860(Ped* pPed, Fix16& x_pos, Fix16& y_pos, Fix16 
     y_pos += field_4C_pan_y * depth_scale;
 }
 
+void Camera::ApplySpectatorPanOffset(Fix16& x_pos, Fix16& y_pos, Fix16 z_pos)
+{
+    Fix16 depth_scale = (z_pos - 4 + Fix16(8)) / field_60_screen_scale.y; // TODO: pPed->get_cam_z() -> spectator ZPOS
+    x_pos += field_48_pan_x * depth_scale;
+    y_pos += field_4C_pan_y * depth_scale;
+}
+
 MATCH_FUNC(0x4368E0)
 Camera::Camera()
 {
@@ -772,6 +872,7 @@ Camera::Camera()
     SetScreenSize_4361B0(640, 480);
     field_44_suspicion = 0;
     ResetPanning_436830();
+    spectator_player = NULL;
 }
 
 MATCH_FUNC(0x4369E0)
