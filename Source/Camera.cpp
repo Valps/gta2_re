@@ -689,6 +689,7 @@ void Camera::HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_o
     else
     {
         field_50_pan_speed_up = kInitialPanSpeed_6766E4;
+        field_4C_pan_y = Fix16(0);
     }
 
     if (foot_brake_on)
@@ -704,6 +705,10 @@ void Camera::HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_o
     else
     {
         field_54_pan_speed_down = kInitialPanSpeed_6766E4;
+        if (!forward_gas_on)
+        {
+            field_4C_pan_y = Fix16(0);
+        }
     }
 
     if (left_on)
@@ -719,6 +724,7 @@ void Camera::HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_o
     else
     {
         field_58_pan_speed_left = kInitialPanSpeed_6766E4;
+        field_48_pan_x = Fix16(0);
     }
 
     if (right_on)
@@ -734,6 +740,10 @@ void Camera::HandleSpectatorCam(char_type forward_gas_on, char_type foot_brake_o
     else
     {
         field_5C_pan_speed_right = kInitialPanSpeed_6766E4;
+        if (!left_on)
+        {
+            field_48_pan_x = Fix16(0);
+        }
     }
 }
 
