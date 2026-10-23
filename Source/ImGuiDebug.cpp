@@ -1685,12 +1685,25 @@ void CC ImGuiDebugDraw()
                     Player* pPlayer = gGame_0x40_67E008->field_4_players[0];
                     if (pPlayer)
                     {
+                        ImGui::Value("GameCam Mode", pPlayer->field_68_camera_mode);
+
                         Camera* game_camera = &pPlayer->field_90_game_camera;
-                        //Camera* view_camera = &pPlayer->field_14C_view_camera;
-                        //Camera* aux_camera = &pPlayer->field_208_aux_game_camera;
+                        Camera* view_camera = &pPlayer->field_14C_view_camera;
+                        Camera* aux_camera = &pPlayer->field_208_aux_game_camera;
                         if (game_camera)
                         {
-                            ImGui::SliderInt("field_A4", &game_camera->field_98_cur_pos.field_C_zoom.mValue, 0, 25000);
+                            ImGui::Value("GameCam Z", game_camera->field_98_cur_pos.field_8_z.mValue);
+                            ImGui::Value("GameCam PenTarget Z", game_camera->field_10_pending_target_pos.field_8_z.mValue);
+                            ImGui::Value("GameCam Target Z", game_camera->field_0_target_pos.field_8_z.mValue);
+                            //ImGui::SliderInt("field_A4", &game_camera->field_98_cur_pos.field_C_zoom.mValue, 0, 25000);
+                        }
+
+                        if (view_camera)
+                        {
+                            ImGui::Value("ViewCam Z", view_camera->field_98_cur_pos.field_8_z.mValue);
+                            ImGui::Value("ViewCam PenTarget Z", view_camera->field_10_pending_target_pos.field_8_z.mValue);
+                            ImGui::Value("ViewCam Target Z", view_camera->field_0_target_pos.field_8_z.mValue);
+                            //ImGui::SliderInt("field_A4", &game_camera->field_98_cur_pos.field_C_zoom.mValue, 0, 25000);
                         }
                     }
                 }
