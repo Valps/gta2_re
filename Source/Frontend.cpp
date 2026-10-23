@@ -3553,7 +3553,7 @@ void Frontend::SetupMenuStringsOptionsElements_4B0220()
     wcsncpy(pPage->field_4_options_array[1].field_6_option_name_str,
             gText_0x14_704DFC->Find_5B5F90("options"),
             0x32u);
-    pPage->field_4_options_array[1].field_80_menu_page_target = 257;
+    pPage->field_4_options_array[1].field_80_menu_page_target = MENUPAGE_OPTIONS_16;
     pPage->field_4_options_array[2].field_0_option_type = STRING_TEXT_1;
     pPage->field_4_options_array[2].field_2_x_pos = 300;
     pPage->field_4_options_array[2].field_4_y_pos = 290;
@@ -3567,6 +3567,9 @@ void Frontend::SetupMenuStringsOptionsElements_4B0220()
     pPage->field_B8A_option_states[2].field_2_unused = 298;
     pPage->field_BC6_current_option_idx = 0;
     pPage->field_BC8_default_option_idx = 0;
+
+    // Play menu
+
     pPage = &field_136_menu_pages_array[1];
     pPage->field_0_number_of_options = 5;
     pPage->field_4_options_array[0].field_0_option_type = STRING_TEXT_2;
@@ -3599,6 +3602,7 @@ void Frontend::SetupMenuStringsOptionsElements_4B0220()
             gText_0x14_704DFC->Find_5B5F90("hi_scre"),
             0x32u);
     pPage->field_4_options_array[2].field_80_menu_page_target = 5;
+
     pPage->field_4_options_array[3].field_0_option_type = STRING_TEXT_1;
     pPage->field_4_options_array[3].field_2_x_pos = 300;
     pPage->field_4_options_array[3].field_4_y_pos = 270;
@@ -3672,6 +3676,9 @@ void Frontend::SetupMenuStringsOptionsElements_4B0220()
     pPage->field_518_elements_array[9].field_2_xpos = 580;
     pPage->field_518_elements_array[9].field_4_ypos = 222;
     pPage->field_518_elements_array[9].field_6_geometric_shape_type = 4;
+
+
+
     pPage = &field_136_menu_pages_array[11];
     pPage->field_0_number_of_options = 3;
     pPage->field_2_number_of_elements = 1;
@@ -4116,6 +4123,45 @@ void Frontend::SetupMenuStringsOptionsElements_4B0220()
     pPage->field_BC6_current_option_idx = 0;
     pPage->field_BC8_default_option_idx = 0;
     field_EE0E_credits.LoadCredits_483F20();
+
+    // Options Page //
+
+    pPage = &field_136_menu_pages_array[16];
+    pPage->field_0_number_of_options = 2;
+    pPage->field_2_number_of_elements = 0;
+
+    // Spectator Mode option
+    
+    pPage->field_4_options_array[0].field_0_option_type = STRING_TEXT_2;
+    pPage->field_4_options_array[0].field_2_x_pos = 300;
+    pPage->field_4_options_array[0].field_4_y_pos = 250;
+    pPage->field_4_options_array[0].field_7E_horizontal_max_idx = 1;
+    pPage->field_4_options_array[0].field_6E_horizontal_selected_idx = gSpectator;
+    pPage->field_4_options_array[0].field_70_unused = 0;
+
+    wcsncpy(pPage->field_4_options_array[0].field_6_option_name_str,
+            L"SPECTATOR MODE",
+            50);
+
+    u16 enabled_idx3 = 0;
+    do
+    {
+        pPage->field_4_options_array[0].field_72_horizontal_idx_enabled[enabled_idx3++] = 1;
+    } while (enabled_idx3 <= pPage->field_4_options_array[0].field_7E_horizontal_max_idx);
+
+    pPage->field_B8A_option_states[0].field_0_unused = 280;
+    pPage->field_B8A_option_states[0].field_2_unused = 163;
+    pPage->field_BC6_current_option_idx = 0; // (u16)gSpectator
+    pPage->field_BC8_default_option_idx = 0;
+
+    // Open GTA2 manager option
+    pPage->field_4_options_array[1].field_0_option_type = STRING_TEXT_1;
+    pPage->field_4_options_array[1].field_2_x_pos = 300;
+    pPage->field_4_options_array[1].field_4_y_pos = 270;
+    wcsncpy(pPage->field_4_options_array[1].field_6_option_name_str,
+            L"OPEN GTA2 MANAGER",
+            50);
+    pPage->field_4_options_array[1].field_80_menu_page_target = MENUPAGE_GTA2MANAGER;
 }
 
 // The GMP/STY/SCR names read from a MAIN or BONUS block of the .seq file. A struct (not three
