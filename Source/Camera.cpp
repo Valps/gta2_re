@@ -655,29 +655,29 @@ void Camera::UpdateFollowPedCamera_436540(Ped* pPed)
     {
         Fix16 xpos = field_10_pending_target_pos.field_0_x;
         Fix16 ypos = field_10_pending_target_pos.field_4_y;
-        Fix16 zpos = field_10_pending_target_pos.field_8_z;
+        Fix16 zpos = field_98_cur_pos.field_8_z;
         Camera::ApplySpectatorPanOffset(xpos, ypos, zpos);
-        SetPendingTarget_41E3D0(xpos, ypos, zpos, kDefaultZoom_6766D4);
+        //SetPendingTarget_41E3D0(xpos, ypos, zpos, kDefaultZoom_6766D4);
+        field_10_pending_target_pos.field_0_x = xpos;
+        field_10_pending_target_pos.field_4_y = ypos;
+        if (field_0_target_pos.field_8_z != field_10_pending_target_pos.field_8_z + field_40_target_elevation)
+        {
+            field_0_target_pos.field_8_z = field_10_pending_target_pos.field_8_z + field_40_target_elevation;
+        }
     }
 }
 
 void Camera::StopSpectatorCam()
 {
-    /*
     field_10_pending_target_pos.field_0_x = field_98_cur_pos.field_0_x;
     field_10_pending_target_pos.field_4_y = field_98_cur_pos.field_4_y;
-    field_10_pending_target_pos.field_8_z = field_98_cur_pos.field_8_z;
     field_10_pending_target_pos.field_C_zoom = kDefaultZoom_6766D4;
-    
     field_0_target_pos.field_0_x = field_98_cur_pos.field_0_x;
-    field_0_target_pos.field_4_y = field_98_cur_pos.field_4_y;
-    field_0_target_pos.field_8_z = field_98_cur_pos.field_8_z;
     field_0_target_pos.field_C_zoom = kDefaultZoom_6766D4;
     */
       // Fix infinite zoom in/out
     SetPendingTarget_41E3D0(field_98_cur_pos.field_0_x,
         field_98_cur_pos.field_4_y,
-        field_98_cur_pos.field_8_z,
         kDefaultZoom_6766D4
     );
     
