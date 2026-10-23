@@ -872,7 +872,7 @@ void Player::InitPlayerPed_565490(Ped* pPed)
 
     for (s32 weapon_idx = weapon_type::pistol; weapon_idx < weapon_type::car_bomb; ++weapon_idx)
     {
-        if (!bGet_all_weapons_67D684 || weapon_idx >= weapon_type::weapon_11 || weapon_idx == weapon_type::electro_batton)
+        if (!bGet_all_weapons_67D684 || weapon_idx >= weapon_type::weapon_12 || weapon_idx == weapon_type::electro_batton)
         {
             ammo = 0;
         }

@@ -1981,8 +1981,127 @@ void Weapon::pull_trigger_5E3670()
             car_bomb_5E0AB0(1);
             break;
 
+        case weapon_type::weapon_11:
+            pull_cargun_trigger();
+            break;
         default:
             return;
+    }
+}
+
+void Weapon::pull_cargun_trigger()
+{
+    Fix16_Point point;
+    if (field_2_reload_timer == 0)
+    {
+        set_field_2C_4CCA80(1);
+        if (!field_4_bTargetHit)
+        {
+            Ang16 AimAngle;
+            AimAngle = field_24_pPed->ComputeAimAngle_45C9D0();
+
+            point.x = -kFpPoint03_706E7C;
+            point.y = kFpPoint1_706CF0 + kFpPoint02_706E80;
+
+            point.RotateByAngle_40F6B0(field_24_pPed->field_168_game_object->field_80_sprite_ptr->field_0_rotation);
+
+            point = point.Add_40AC50(field_24_pPed->GetVelocityVector_45B520());
+
+            if (field_24_pPed->is_player_41B0A0())
+            {
+                /*
+                u16 car_kind;
+                s32 car_model = gCar_6C_677930->SelectTrafficCarModel_444AB0(field_24_pPed->field_15C_player, 
+                    gMap_0x370_6F6268->get_nav_zone_unknown_4DF890(
+                        field_24_pPed->get_cam_x().ToInt(), 
+                        field_24_pPed->field_1AC_cam.y.ToInt()), 
+                    Fix16(1), 
+                    &car_kind);
+                */
+                s32 car_model = car_model_enum::GT24640;
+                
+                Car* pCar = gCarManager_6C_677930->SpawnCarAt_446230(
+                    field_24_pPed->get_cam_x() + point.x,
+                    field_24_pPed->get_cam_y() + point.y,
+                    field_24_pPed->get_cam_z() + Fix16(0.3),
+                    AimAngle,
+                    car_model,
+                    Fix16(1)
+                );
+                
+                if (pCar)
+                {
+                    pCar->IncrementCarStats_443D70(car_kind::recycled_1);
+
+                    // reposition
+                    Fix16 pHalfW;
+                    Fix16 pHalfH;
+                    pCar->field_50_car_sprite->field_C_pCollisionShape->GetHalfExtents_4BA0A0(&pHalfW, &pHalfH);
+                    Fix16_Point offset(Fix16(0), pHalfW);
+                    offset.RotateByAngle_40F6B0(AimAngle);
+                    offset = offset * Fix16(2.1f);
+                    pCar->field_50_car_sprite->set_xy_lazy_447E20(
+                        pCar->field_50_car_sprite->field_14_xy.x + offset.x,
+                        pCar->field_50_car_sprite->field_14_xy.y + offset.y
+                    );
+
+                    pCar->SetupCarPhysicsAndSpriteBinding_43BC30();
+                    if (pCar->field_58_physics)
+                    {
+                        Fix16_Point velocity(Fix16(0), Fix16(-2.0f));
+                        velocity.RotateByAngle_40F6B0(AimAngle);
+                        pCar->field_58_physics->field_40_linvel_1 = -velocity;
+                        //pCar->field_58_physics->field_74_ang_vel_rad = Fix16(-40 + gRng_6F6784.get_int_4F7AE0(81)) / 8;
+                    }
+                    //pCar->FireCarBomb_440F90(0);
+                }
+                DecreaseAmmo_4CCA60();
+            }
+            else
+            {
+                if (Weapon::spawn_bullet_5DCF60(254,
+                                               field_24_pPed->get_cam_x() + point.x,
+                                               field_24_pPed->get_cam_y() + point.y,
+                                               field_24_pPed->get_cam_z(),
+                                               AimAngle,
+                                               field_24_pPed->GetVelocityVector_45B520()))
+                {
+                    if (field_24_pPed->PedTypeIs_45EDE0(ped_type::player_2))
+                    {
+                        DecreaseAmmo_4CCA60();
+                    }
+                }
+            }
+
+            
+
+            field_2_reload_timer = 2;
+            gParticle_8_6FD5E8->GunMuzzelFlash_53E970(field_24_pPed->field_168_game_object->field_80_sprite_ptr);
+
+            if (field_1C_idx != weapon_type::silence_smg)
+            {
+                field_24_pPed->AddThreateningPedToList_46FC70();
+                if (field_24_pPed->is_player_41B0A0())
+                {
+                    gCrimeReportQueue_67A4B8->ReportCrimeForPed(crime_stats_type::weapon_fired_2, field_24_pPed);
+                }
+            }
+        }
+        else
+        {
+            Weapon::spawn_bullet_5DCF60(154,
+                                        field_24_pPed->get_cam_x(),
+                                        field_24_pPed->get_cam_y(),
+                                        field_24_pPed->get_cam_z(),
+                                        field_24_pPed->GetAimAngle_4CCA90(),
+                                        field_24_pPed->GetVelocityVector_45B520());
+            field_2_reload_timer = 1;
+        }
+        Weapon::ApplyFastReload_5DCF40();
+    }
+    else
+    {
+        field_2_reload_timer--;
     }
 }
 
