@@ -525,7 +525,7 @@ inline void CarPhysics::TurnClockwise_42ABA0()
 }
 #pragma warning(pop)
 
-class CarPhyisicsPool : public PoolBasic<CarPhysics, 306>
+class CarPhyisicsPool : public PoolBasic<CarPhysics, 1306>
 {
   public:
     //Inlined in CarManager constructor 9.6f -> 0x420f8
