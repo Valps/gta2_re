@@ -2024,7 +2024,7 @@ void Weapon::pull_cargun_trigger()
                     field_24_pPed->get_cam_x() + point.x,
                     field_24_pPed->get_cam_y() + point.y,
                     field_24_pPed->get_cam_z() + Fix16(0.3),
-                    AimAngle,
+                    AimAngle + Ang16(360),
                     car_model,
                     Fix16(1)
                 );
