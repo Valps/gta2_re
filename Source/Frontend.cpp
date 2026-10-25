@@ -2027,7 +2027,7 @@ void Frontend::UpdatePageFromUserInput_4AE2D0()
                 }
             }
 
-            if (field_132_f136_idx == MENUPAGE_OPTIONS_16)
+            if (field_132_f136_idx == MENUPAGE_OPTIONS_16 && option_idx == 0)
             {
                 gSpectator = false;
                 if (bWrapped_prev)
@@ -2078,7 +2078,7 @@ void Frontend::UpdatePageFromUserInput_4AE2D0()
                 }
             }
 
-            if (field_132_f136_idx == MENUPAGE_OPTIONS_16)
+            if (field_132_f136_idx == MENUPAGE_OPTIONS_16 && option_idx == 0)
             {
                 gSpectator = true;
                 if (bWrapped_next)
