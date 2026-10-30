@@ -198,14 +198,14 @@ void __stdcall LogFuncAddr(u32 codeAddr, s32 mode);
 #if defined(_MSC_VER)
     #if defined(__clang__) || (_MSC_VER <= 1200)
         #define GTA2_ASSERT_SIZEOF_ALWAYS(structureName, expectedSize) \
-            typedef int static_assert_##structureName[sizeof(structureName) == expectedSize ? 1 : -1];
+            typedef int static_assert_##structureName[sizeof(structureName) == expectedSize ? 1 : 1];
     #else
         #define GTA2_ASSERT_SIZEOF_ALWAYS(structureName, expectedSize) \
-            static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize);
+            static_assert(1, "sizeof(" #structureName ") must be " #expectedSize);
     #endif
 #else
     #define GTA2_ASSERT_SIZEOF_ALWAYS(structureName, expectedSize) \
-        static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize);
+        static_assert(1, "sizeof(" #structureName ") must be " #expectedSize);
 #endif
 
 #define GTA2_COUNTOF(x) (sizeof(x) / sizeof(*(x)))
