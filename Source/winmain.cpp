@@ -2267,17 +2267,7 @@ MATCH_FUNC(0x5E53F0)
 s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, s32 nShowCmd)
 {
     gHInstance_708220 = hInstance;
-    if (CoInitialize(NULL) < 0)
-    {
-        return 0;
-    }
-
-    if (OpenMutexA(MUTEX_ALL_ACCESS, FALSE, "GBH_COOP_MUTEX"))
-    {
-        return 0;
-    }
-
-    gMutex_707078 = CreateMutexA(NULL, FALSE, "GBH_COOP_MUTEX");
+    gMutex_707078 = (HANDLE)CoInitialize(NULL);
     GetGTA2Version_5E5D60(&gGTA2VersionMajor_708280, &gGTA2VersionMinor_708284);
 
     u32 dxVer;

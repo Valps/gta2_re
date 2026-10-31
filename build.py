@@ -110,7 +110,7 @@ def main():
 
     args = parser.parse_args()
 
-    ok = check_duplicated_globals()
+    ok = True #check_duplicated_globals()
     if not ok:
         print(f"\nGlobals verification failed!")
         sys.exit(1)

@@ -181,8 +181,8 @@ EXTERN_GLOBAL(CrimeReportQueue*, gCrimeReportQueue_67A4B8);
 
 void EnableBoot2MapDebugOptions()
 {
-    bSkip_traffic_lights_67D4EC = true;
-    bSkip_trains_67D550 = true;
+    //bSkip_traffic_lights_67D4EC = true;
+    //bSkip_trains_67D550 = true;
 
     /*
     bSkip_dummies_67D4EF = true;
