@@ -936,6 +936,21 @@ void __stdcall ExitGameCallback_4DB0D0(Game* pGame, s32 reason)
     pGame->ExitGameNoBonus_4B8C00(0, GameExitType::CloseGameImmediately_1);
 }
 
+void InitializeInputBuffer() // Pretend that the first game inputs were given to us
+{
+    memset(&gCurrentNetInputs_6F57D8, 0, sizeof(gCurrentNetInputs_6F57D8));
+    for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+    {
+        if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use)
+        {
+            for (u32 tick = 0; tick <= gDelayedTicks; tick++)
+            {
+                gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks - tick].field_8_tick = tick;
+            }
+        }
+    }
+}
+
 // todo move to another file for ordering
 // https://decomp.me/scratch/VazoB
 MATCH_FUNC(0x4DA4D0)
@@ -963,7 +978,7 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         gGame_0x40_67E008 = new Game(gNetPlay_7071E8.CountActivePlayers_521350(), gNetPlay_7071E8.GetPlayerIdx_409C40());
         gNetPlay_7071E8.SetExitGameCallBack_521330(reinterpret_cast<int>(ExitGameCallback_4DB0D0), gGame_0x40_67E008);
 
-        memset(&gCurrentNetInputs_6F57D8, 0, sizeof(gCurrentNetInputs_6F57D8));
+        InitializeInputBuffer();
         memset(&gPrevNetInputs_6F5B28, 0, sizeof(gPrevNetInputs_6F5B28));
 
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
@@ -1444,6 +1459,29 @@ EXPORT void ManageNetworkTimeAndHudPager_4DADA0()
     }
 }
 
+void CopyAndShiftPlayerInputs()
+{
+    // write the inputs of all players
+    memcpy(&gPrevNetInputs_6F5B28, &gCurrentNetInputs_6F57D8, sizeof(Network_AllInputsBuffer));
+    
+    // shift input buffer array
+    for (u32 plyr_idx = 0; plyr_idx < MAX_PLAYERS; plyr_idx++)
+    {
+        if (gNetPlay_7071E8.field_758_n2.field_10_players[plyr_idx].field_0_in_use)
+        {
+            memcpy(&gTmpInputBuffer, &gCurrentNetInputs_6F57D8, sizeof(Network_AllInputsBuffer));
+            memcpy(&gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][1], &gTmpInputBuffer.field_0_input[plyr_idx][0], gDelayedTicks * sizeof(Network_InputData));
+        }
+
+        if (plyr_idx != gNetworkPlayerIdx_6F56C8)
+        {
+            gTmpInputBuffer.field_0_input[plyr_idx][0].field_0_Inputs = 0;
+            gTmpInputBuffer.field_0_input[plyr_idx][0].field_4_rng = 0;
+            gTmpInputBuffer.field_0_input[plyr_idx][0].field_8_tick = 0xFFFFFFFF;
+        }
+    }
+}
+
 MATCH_FUNC(0x4DAF30)
 EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
 {
@@ -1482,17 +1520,7 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
             Net_Send_Our_Inputs_4DACB0();
             Draw_4DA7B0();
             Net_Receive_Players_Inputs_4DA9F0();
-            memcpy(&gPrevNetInputs_6F5B28, &gCurrentNetInputs_6F57D8, sizeof(Network_AllInputsBuffer));
-            
-            // shift input buffer array
-            for (u32 plyr_idx = 0; plyr_idx < MAX_PLAYERS; plyr_idx++)
-            {
-                if (gNetPlay_7071E8.field_758_n2.field_10_players[plyr_idx].field_0_in_use)
-                {
-                    memcpy(&gTmpInputBuffer, &gCurrentNetInputs_6F57D8, sizeof(Network_AllInputsBuffer));
-                    memcpy(&gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][1], &gTmpInputBuffer.field_0_input[plyr_idx][0], gDelayedTicks * sizeof(Network_InputData));
-                }
-            }
+            CopyAndShiftPlayerInputs();
         }
         else
         {
@@ -2414,7 +2442,8 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
         else
         {
             InitializeGame_4DA4D0();
-            bDo_sync_check_67D6C1 = true;
+            bDo_sync_check_67D6C1 = true; // TODO: remove these later
+            gShow_cycle_67D6BD = true;
             if (bStartNetworkGame_7081F0 && !gNetPlay_7071E8.WaitForPlayersSync_5213E0())
             {
                 CoUninitialize();
