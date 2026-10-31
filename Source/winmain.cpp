@@ -1415,8 +1415,11 @@ EXPORT void ManageNetworkTimeAndHudPager_4DADA0()
         }
     }
 
-    swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
-    gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
+    if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
+    {
+        swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
+    }
 }
 
 MATCH_FUNC(0x4DAF30)
