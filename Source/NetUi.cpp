@@ -505,24 +505,24 @@ struct Network_UI_Control_Data_Array
 
         // Clear remaining array for windows 1:
 
-        data[HOST_LOBBY_1][18].field_0_windowParams.field_0_x = 0;
-        data[HOST_LOBBY_1][18].field_0_windowParams.field_4_y = 0;
-        data[HOST_LOBBY_1][18].field_0_windowParams.field_8_w = 0;
-        data[HOST_LOBBY_1][18].field_0_windowParams.field_C_h = 0;
-        data[HOST_LOBBY_1][18].field_0_windowParams.field_10_hMenu = static_cast<HMENU>(NULL);
-        data[HOST_LOBBY_1][18].field_0_windowParams.field_14_style = 0x0;
+        data[HOST_LOBBY_1][18].field_0_windowParams.field_0_x = 10;
+        data[HOST_LOBBY_1][18].field_0_windowParams.field_4_y = 360;
+        data[HOST_LOBBY_1][18].field_0_windowParams.field_8_w = 200;
+        data[HOST_LOBBY_1][18].field_0_windowParams.field_C_h = 30;
+        data[HOST_LOBBY_1][18].field_0_windowParams.field_10_hMenu = reinterpret_cast<HMENU>(TRACKBAR_DELAY_TICKS_1100);
+        data[HOST_LOBBY_1][18].field_0_windowParams.field_14_style = 0x40000001;
         data[HOST_LOBBY_1][18].field_0_windowParams.field_18_exStyle = 0x0;
-        strcpy(data[HOST_LOBBY_1][18].field_1C_window_class_name, "");
+        strcpy(data[HOST_LOBBY_1][18].field_1C_window_class_name, "msctls_trackbar32");
         strcpy(data[HOST_LOBBY_1][18].field_6C_gtx_string_name, "");
 
-        data[HOST_LOBBY_1][19].field_0_windowParams.field_0_x = 0;
-        data[HOST_LOBBY_1][19].field_0_windowParams.field_4_y = 0;
-        data[HOST_LOBBY_1][19].field_0_windowParams.field_8_w = 0;
-        data[HOST_LOBBY_1][19].field_0_windowParams.field_C_h = 0;
-        data[HOST_LOBBY_1][19].field_0_windowParams.field_10_hMenu = static_cast<HMENU>(NULL);
-        data[HOST_LOBBY_1][19].field_0_windowParams.field_14_style = 0x0;
+        data[HOST_LOBBY_1][19].field_0_windowParams.field_0_x = 10;
+        data[HOST_LOBBY_1][19].field_0_windowParams.field_4_y = 400;
+        data[HOST_LOBBY_1][19].field_0_windowParams.field_8_w = 200;
+        data[HOST_LOBBY_1][19].field_0_windowParams.field_C_h = 30;
+        data[HOST_LOBBY_1][19].field_0_windowParams.field_10_hMenu = reinterpret_cast<HMENU>(LABEL_DELAY_TICKS_1101);
+        data[HOST_LOBBY_1][19].field_0_windowParams.field_14_style = 0x40000000;
         data[HOST_LOBBY_1][19].field_0_windowParams.field_18_exStyle = 0x0;
-        strcpy(data[HOST_LOBBY_1][19].field_1C_window_class_name, "");
+        strcpy(data[HOST_LOBBY_1][19].field_1C_window_class_name, "STATIC");
         strcpy(data[HOST_LOBBY_1][19].field_6C_gtx_string_name, "");
 
         data[HOST_LOBBY_1][20].field_0_windowParams.field_0_x = 0;
@@ -1039,6 +1039,7 @@ NetUi::NetUi()
     this->field_20088_game_settings.field_2018C_map_idx = 0;
     this->field_20088_game_settings.field_201A0_police_on = 0;
     this->field_20088_game_settings.field_201A4_game_time_limit = 0;
+    this->field_20088_game_settings.field_201A8_tick_delay = 0;
     memset(field_4_maps, 0, sizeof(field_4_maps));
     gtext_0x14_6F87F0 = new TextTable();
     gtext_0x14_6F87F0->Load_5B5E90();
@@ -1561,6 +1562,7 @@ void NetUi::CreateMainUi_51AA90(HWND hWndParent)
 
     // set range of game speed slider: 0 to 2 (that is, 3 options)
     SendDlgItemMessageA(hWndParent, TRACKBAR_GAME_SPEED_1031, TBM_SETRANGE, TRUE, MAKELONG(0, 2)); 
+    SendDlgItemMessageA(hWndParent, TRACKBAR_DELAY_TICKS_1100, TBM_SETRANGE, TRUE, MAKELONG(0, 5)); 
 
     SetDlgItemTextA(hWndParent, LABEL_COPS_1028, GetString_519A00("netui14")); // "Cops"
     SetDlgItemTextA(hWndParent, LABEL_TIME_LIMIT_MINUTES_1037, GetString_519A00("netui21")); // "Time Limit (Minutes)"
@@ -1773,6 +1775,7 @@ void NetUi::PopulateMainUI_51AFA0()
                                                  field_20088_game_settings.field_20194_frag_limit,
                                                  field_2031C_dlg_hwnd);
     NetUi::SetGameSpeedTextLabelAndSlider_51CFC0(field_20088_game_settings.field_20190_game_speed, field_2031C_dlg_hwnd);
+    NetUi::SetTickDelayTextLabelAndSlider_51CFC0(field_20088_game_settings.field_201A8_tick_delay, field_2031C_dlg_hwnd);
     NetUi::SetGameTimeLimitTextBox_51D3B0(field_20088_game_settings.field_201A4_game_time_limit, field_2031C_dlg_hwnd);
 }
 
@@ -2005,6 +2008,7 @@ void NetUi::SetSetting_51B9C0(s32 setting, s32 value)
 {
     Network_Buffer data;
     char_type* pSpeedText;
+    char_type pDelayText[16];
 
     switch (setting)
     {
@@ -2070,6 +2074,12 @@ void NetUi::SetSetting_51B9C0(s32 setting, s32 value)
         case 7:
             field_20088_game_settings.field_201A4_game_time_limit = value;
             gRegistry_6FF968.Set_Network_Setting_587730("game_time_limit", value);
+            break;
+
+        case 8: // Tick delay
+            field_20088_game_settings.field_201A8_tick_delay = value;
+            sprintf(pDelayText, "Delay Ticks: %d", value);
+            SetDlgItemTextA(field_2031C_dlg_hwnd, LABEL_DELAY_TICKS_1101, pDelayText);
             break;
     }
 
@@ -2345,6 +2355,27 @@ void __stdcall NetUi::OnWmHScroll_51C630(HWND hWnd, HWND hTrackBar, s32 code, s3
                 return;
         }
     }
+    else if (GetDlgCtrlID(hTrackBar) == TRACKBAR_DELAY_TICKS_1100)
+    {
+        switch (code)
+        {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 6:
+            case 7:
+            {
+                const int pos2 = SendDlgItemMessageA(hWnd, TRACKBAR_DELAY_TICKS_1100, TBM_GETPOS, 0, 0);
+                pThis->SetSetting_51B9C0(8, static_cast<s32>(pos2)); // set game speed
+            }
+            break;
+
+            case 5:
+                return;
+        }
+    }
 }
 
 MATCH_FUNC(0x51c7f0)
@@ -2531,6 +2562,16 @@ void NetUi::SetGameSpeedTextLabelAndSlider_51CFC0(LPARAM game_speed, HWND hDlg)
     }
     SetDlgItemTextA(hDlg, LABEL_GAME_SPEED_TEXT_1032, pText);
 }
+
+void NetUi::SetTickDelayTextLabelAndSlider_51CFC0(LPARAM tick_delay, HWND hDlg)
+{
+    SendDlgItemMessageA(hDlg, TRACKBAR_DELAY_TICKS_1100, 0x405, 1u, tick_delay); // 0x405 = TBM_SETPOS
+
+    char_type pDelayText[16];
+    sprintf(pDelayText, "Delay Ticks: %d", tick_delay);
+    SetDlgItemTextA(field_2031C_dlg_hwnd, LABEL_DELAY_TICKS_1101, pDelayText);
+}
+
 #pragma warning(pop)
 
 MATCH_FUNC(0x51d0c0)

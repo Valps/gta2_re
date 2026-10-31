@@ -52,6 +52,9 @@ enum Network_UI_Control_Ids
     TEXTBOX_PLAYER_NAME_1004 = 1004u,
     LABEL_GAME_SPEED_1055 = 1055u,
     LABEL_JOINED_GAME_MAP_1054 = 1054u,
+
+    TRACKBAR_DELAY_TICKS_1100 = 1100,
+    LABEL_DELAY_TICKS_1101 = 1101,
 };
 
 struct Network_Enumerated_Map
@@ -74,6 +77,7 @@ struct NetworkGameSettings
     u32 field_2019C_tick_count;
     u32 field_201A0_police_on;
     u32 field_201A4_game_time_limit;
+    u32 field_201A8_tick_delay;
 };
 
 class NetUi
@@ -132,6 +136,7 @@ class NetUi
     EXPORT void SetJoinedGamePoliceEnabledText_51CD30(s32 bPoliceOn, HWND hDlg);
     EXPORT void SetFragsNumberAndLabel_51CDC0(s32 gameType, s32 fragLimit, HWND hDlg);
     EXPORT void SetGameSpeedTextLabelAndSlider_51CFC0(LPARAM game_speed, HWND hDlg);
+    void SetTickDelayTextLabelAndSlider_51CFC0(LPARAM game_speed, HWND hDlg);
     EXPORT void SetJoinedGameTypeAndFragLimitText_51D0C0(s32 game_type, s32 frag_limit, HWND hDlg);
     EXPORT void SetJoinedGameTimeLimitText_51D2F0(s32 gameTimeLimit, HWND hDlg);
     EXPORT void SetGameTimeLimitTextBox_51D3B0(s32 timeLimitMins, HWND hDlg);
