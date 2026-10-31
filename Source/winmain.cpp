@@ -1099,6 +1099,8 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
         // Wait a packet. If one was received, analyse its data and do something
         s32 player_idx;
         u32 packet_subtype;
+        u32 remote_rng;
+        u32 local_rng;
         if (gNetPlay_7071E8.ReceiveGameMessage_521890(reinterpret_cast<Network_Buffer*>(&gpInputBuffer_6F58C0), &player_idx, &packet_subtype))
         {
             switch (packet_subtype)
@@ -1126,19 +1128,20 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
                     break;
                 }
                 case packet_subtype::PlayerInputs_3: // store player input for the latest/current tick
-                    memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks], gpInputBuffer_6F58C0, gCurrentInputsBufferSize_6F58C4);
+                    memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][0], gpInputBuffer_6F58C0, gCurrentInputsBufferSize_6F58C4);
                     waiting_bits &= ~(1 << player_idx);
 
                     // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
+                    remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][0].field_4_rng;
+                    local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_rng;
                     if (bDo_sync_check_67D6C1 &&
-                        gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng !=
-                            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng)
+                        local_rng != remote_rng)
                     {
                         FatalError_4A38C0(Gta2Error::SyncErrorRandom,
                                           "C:\\Splitting\\Gta2\\Source\\main.cpp",
                                           822,
-                                          gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng,
-                                          gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng);
+                                          remote_rng,
+                                          local_rng);
                     }
                     break;
                 default:
@@ -2392,6 +2395,7 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
         else
         {
             InitializeGame_4DA4D0();
+            bDo_sync_check_67D6C1 = true;
             if (bStartNetworkGame_7081F0 && !gNetPlay_7071E8.WaitForPlayersSync_5213E0())
             {
                 CoUninitialize();

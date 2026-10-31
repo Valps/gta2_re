@@ -1923,7 +1923,7 @@ EXPORT void FatalError_4A07C0(s32 code, const char_type* pFileName, s32 lineNo, 
         {
             s32 va_1 = va_arg(va, s32);
             s32 va_2 = va_arg(va, s32);
-            sprintf(gTmpBuffer_67C598, "Sync error (random) remote=%d local=%d", va_2, va_2);
+            sprintf(gTmpBuffer_67C598, "Sync error (random) remote=%d local=%d", va_1, va_2);
             break;
         }
 
@@ -2271,6 +2271,8 @@ EXPORT void FatalError_4A07C0(s32 code, const char_type* pFileName, s32 lineNo, 
             sprintf(gTmpBuffer_67C598, "No Error Message Declared");
             break;
     }
+
+    va_end(va);
 
     ErrorMsgBox_5E4EC0(gTmpBuffer_67C598);
     gErrorLog_67CF58.Write_4D9620(gTmpBuffer_67C598);
