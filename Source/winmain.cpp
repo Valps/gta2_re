@@ -72,7 +72,7 @@ DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
 //Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
 
-s32 gDelayedTicks = 6;
+u32 gDelayedTicks;
 Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
 Network_AllInputsBuffer gPrevNetInputs_6F5B28;
 Network_AllInputsBuffer gTmpInputBuffer; // used only for shifting arrays
@@ -2649,6 +2649,7 @@ EXPORT bool __stdcall Start_NetworkGame_5E5A30(HINSTANCE hInstance)
                                                            gNetPlay_7071E8.GetPlayerIdx_409C40(),
                                                            gNetPlay_7071E8.CountActivePlayers_521350(),
                                                            gNetworkGameSettings_707098.field_201A4_game_time_limit);
+        gDelayedTicks = gNetworkGameSettings_707098.field_201A8_tick_delay;
     }
     return bRet;
 }
