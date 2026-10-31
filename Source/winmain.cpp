@@ -77,9 +77,10 @@ Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
 Network_AllInputsBuffer gPrevNetInputs_6F5B28;
 Network_AllInputsBuffer gTmpInputBuffer; // used only for shifting arrays
 
-DEFINE_GLOBAL(Network_Buffer, gInputSendData_6F5B18, 0x6F5B18); // TODO: move
-DEFINE_GLOBAL(ReceivedPacket*, gpInputBuffer_6F58C0, 0x6F58C0); // TODO: move
-DEFINE_GLOBAL(u32, gCurrentInputsBufferSize_6F58C4, 0x6F58C4); // TODO: move
+Network_Buffer gInputSendData_6F5B18;
+ReceivedPacket* gpInputBuffer_6F58C0;
+
+u32 gCurrentInputsBufferSize_6F58C4;
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
 DEFINE_GLOBAL(u32, gTotalNetworkTime_6F5980, 0x6F5980); // TODO: move
 DEFINE_GLOBAL(s32, gNetTimeLimit_6F573C, 0x6F573C); // TODO: move
@@ -94,7 +95,8 @@ DEFINE_GLOBAL(s32, gFramesOfCurrSecond_6F5858, 0x6F5858); // TODO: move
 DEFINE_GLOBAL(s32, gNetTimerBlinkCounter_6F5B74, 0x6F5B74);
 DEFINE_GLOBAL(s32, gNetTimerSeconds_6F5944, 0x6F5944);
 DEFINE_GLOBAL(u8, gNetTimerFlashing_6F59C0, 0x6F59C0); // TODO: move
-DEFINE_GLOBAL(NetworkGameSettings, gNetworkGameSettings_707098, 0x707098);
+
+NetworkGameSettings gNetworkGameSettings_707098;
 
 static T_gbh_SetBeginSceneCB pBeginSceneCB = NULL;
 
@@ -965,7 +967,7 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
         gNetworkPlayerIdx_6F56C8 = gNetPlay_7071E8.GetPlayerIdx_409C40();
         gpInputBuffer_6F58C0 = reinterpret_cast<ReceivedPacket*>(&gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0]);
-        gCurrentInputsBufferSize_6F58C4 = 48;
+        gCurrentInputsBufferSize_6F58C4 = sizeof(Network_PlayerInputs); //0x30;
         dword_6F5B00 = 0;
         bRecordStartTime_6F593C = true;
         gPlayerQuit_6F5AEC = false;
@@ -1323,7 +1325,7 @@ EXPORT void Net_Send_Our_Inputs_4DACB0()
             gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0];
             gInputSendData_6F5B18.field_4_len = sizeof(u32);
         }
-        gNetPlay_7071E8.SendToAll_521B20(&gInputSendData_6F5B18);
+        gNetPlay_7071E8.SendPlayerInputsToAll_521B20(&gInputSendData_6F5B18);
     }
 }
 
@@ -1459,7 +1461,8 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
             }
 
             gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_0_Inputs = gInputRecorder_67F8B0.get_input_bits_4CEAC0();
-            
+            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_tick = gpRng_67AB34->get_cur_rng_41CFE0() + gDelayedTicks;
+
             Net_Send_Our_Inputs_4DACB0();
             Draw_4DA7B0();
             Net_Receive_Players_Inputs_4DA9F0();

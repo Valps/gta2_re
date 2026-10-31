@@ -36,6 +36,7 @@ struct Network_InputData
 {
     u32 field_0_Inputs;
     u32 field_4_rng;
+    u32 field_8_tick;
 };
 
 struct Network_InputPacket
