@@ -69,9 +69,15 @@ DEFINE_GLOBAL(u32, gPlayerQuit_6F5AEC, 0x6F5AEC); // TODO: move
 DEFINE_GLOBAL(u32, gMatchStartTime_6F5A28, 0x6F5A28); // TODO: move
 DEFINE_GLOBAL(u32, gNetworkFrameCounter_6F5868, 0x6F5868); // TODO: move
 DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
-DEFINE_GLOBAL(Network_PlayerInputs, gCurrentNetInputs_6F57D8, 0x6F57D8); // TODO: move
+
+//Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
+
+s32 gDelayedTicks = 6;
+Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
+Network_AllInputsBuffer gPrevNetInputs_6F5B28;
+Network_AllInputsBuffer gTmpInputBuffer; // used only for shifting arrays
+
 DEFINE_GLOBAL(Network_Buffer, gInputSendData_6F5B18, 0x6F5B18); // TODO: move
-DEFINE_GLOBAL(Network_PlayerInputs, gPrevNetInputs_6F5B28, 0x6F5B28); // TODO: move
 DEFINE_GLOBAL(ReceivedPacket*, gpInputBuffer_6F58C0, 0x6F58C0); // TODO: move
 DEFINE_GLOBAL(u32, gCurrentInputsBufferSize_6F58C4, 0x6F58C4); // TODO: move
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
@@ -357,7 +363,7 @@ DEFINE_GLOBAL(u32, gLightingDrawFlag_7068F4, 0x7068F4);
 DEFINE_GLOBAL(LPDIRECTINPUTDEVICEA, gMouseDevice_706C60, 0x706C60);
 // The original mouse format uses the seven object records already recovered in Frontend.cpp.
 extern DIOBJECTDATAFORMAT gMouseObjectDataFormats_5EA3D0[7];
-DEFINE_GLOBAL_INIT(DIDATAFORMAT, gMouseDataFormat_601A84, {24u COMMA 16u COMMA DIDF_RELAXIS COMMA 16u COMMA 7u COMMA gMouseObjectDataFormats_5EA3D0}, 0x601A84);
+DEFINE_GLOBAL(DIDATAFORMAT, gMouseDataFormat_601A84, 0x601A84);
 
 DEFINE_GLOBAL_INIT(u8, max_frame_rate_626A08, 1, 0x626A08);
 DEFINE_GLOBAL(u8, min_frame_rate_706C50, 0x706C50);
@@ -958,7 +964,7 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
 
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
         gNetworkPlayerIdx_6F56C8 = gNetPlay_7071E8.GetPlayerIdx_409C40();
-        gpInputBuffer_6F58C0 = reinterpret_cast<ReceivedPacket*>(&gCurrentNetInputs_6F57D8.field_0_inputs[0]);
+        gpInputBuffer_6F58C0 = reinterpret_cast<ReceivedPacket*>(&gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0]);
         gCurrentInputsBufferSize_6F58C4 = 48;
         dword_6F5B00 = 0;
         bRecordStartTime_6F593C = true;
@@ -1050,6 +1056,14 @@ EXPORT void __stdcall NetSendOldInputs_4DA9B0(Network_InputData* pInputs, s32 de
     gNetPlay_7071E8.SendToPlayer_521630(&gInputSendData_6F5B18, player_idx, delayed_ticks);
 }
 
+void SetPreviousInputsHistory(Network_PlayerInputs* pHistory, Network_AllInputsBuffer* pInputsBuffer)
+{
+    for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+    {
+        memcpy(&pHistory->field_0_player[player_idx], &gCurrentNetInputs_6F57D8.field_0_input[player_idx][0], sizeof(Network_InputData));
+    } 
+}
+
 MATCH_FUNC(0x4DA9F0)
 EXPORT void Net_Receive_Players_Inputs_4DA9F0()
 {
@@ -1058,7 +1072,7 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
 
     // Update previous stored inputs
     memcpy(&gNetInputsHistory2_6F5798, &gNetInputsHistory1_6F56E0, sizeof(gNetInputsHistory2_6F5798));
-    memcpy(&gNetInputsHistory1_6F56E0, &gCurrentNetInputs_6F57D8, sizeof(gNetInputsHistory1_6F56E0));
+    SetPreviousInputsHistory(&gNetInputsHistory1_6F56E0, &gCurrentNetInputs_6F57D8);
 
     // Check which players we are waiting for
     u32 waiting_bits = 0;
@@ -1112,19 +1126,19 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
                     break;
                 }
                 case packet_subtype::PlayerInputs_3: // store player input for the latest/current tick
-                    memcpy(&gCurrentNetInputs_6F57D8.field_0_inputs[player_idx], gpInputBuffer_6F58C0, gCurrentInputsBufferSize_6F58C4);
+                    memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks], gpInputBuffer_6F58C0, gCurrentInputsBufferSize_6F58C4);
                     waiting_bits &= ~(1 << player_idx);
 
                     // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
                     if (bDo_sync_check_67D6C1 &&
-                        gCurrentNetInputs_6F57D8.field_0_inputs[player_idx].field_4_rng !=
-                            gCurrentNetInputs_6F57D8.field_0_inputs[gNetworkPlayerIdx_6F56C8].field_4_rng)
+                        gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng !=
+                            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng)
                     {
                         FatalError_4A38C0(Gta2Error::SyncErrorRandom,
                                           "C:\\Splitting\\Gta2\\Source\\main.cpp",
                                           822,
-                                          gCurrentNetInputs_6F57D8.field_0_inputs[player_idx].field_4_rng,
-                                          gCurrentNetInputs_6F57D8.field_0_inputs[gNetworkPlayerIdx_6F56C8].field_4_rng);
+                                          gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng,
+                                          gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng);
                     }
                     break;
                 default:
@@ -1160,8 +1174,8 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
             {
                 if (waiting_bits & (1 << k))
                 {
-                    NetSendOldInputs_4DA9B0(&gNetInputsHistory1_6F56E0.field_0_inputs[gNetworkPlayerIdx_6F56C8], 1, k);
-                    NetSendOldInputs_4DA9B0(&gNetInputsHistory2_6F5798.field_0_inputs[gNetworkPlayerIdx_6F56C8], 2, k);
+                    NetSendOldInputs_4DA9B0(&gNetInputsHistory1_6F56E0.field_0_player[gNetworkPlayerIdx_6F56C8], 1, k);
+                    NetSendOldInputs_4DA9B0(&gNetInputsHistory2_6F5798.field_0_player[gNetworkPlayerIdx_6F56C8], 2, k);
                 }
             }
         }
@@ -1297,13 +1311,13 @@ EXPORT void Net_Send_Our_Inputs_4DACB0()
         {
             // Send the inputs plus an rng value the other players check against
             s16 max = 100;
-            gCurrentNetInputs_6F57D8.field_0_inputs[gNetworkPlayerIdx_6F56C8].field_4_rng = gRng_6F6784.get_int_4F7AE0(max);
-            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_inputs[gNetworkPlayerIdx_6F56C8];
+            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_rng = gRng_6F6784.get_int_4F7AE0(max);
+            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0];
             gInputSendData_6F5B18.field_4_len = sizeof(Network_InputData);
         }
         else
         {
-            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_inputs[gNetworkPlayerIdx_6F56C8];
+            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0];
             gInputSendData_6F5B18.field_4_len = sizeof(u32);
         }
         gNetPlay_7071E8.SendToAll_521B20(&gInputSendData_6F5B18);
@@ -1318,8 +1332,8 @@ EXPORT void Net_Set_Local_Player_Inputs_4DAD50()
         Player* pPlayer = gGame_0x40_67E008->GetPlayer_4219E0(player_idx);
         if (pPlayer && pPlayer->GetInUse_461DB0())
         {
-            pPlayer->SetInputs_565740(gPrevNetInputs_6F5B28.field_0_inputs[player_idx].field_0_Inputs);
-            gPrevNetInputs_6F5B28.field_0_inputs[player_idx].field_0_Inputs &= ~0x3FF000;
+            pPlayer->SetInputs_565740(gPrevNetInputs_6F5B28.field_0_input[player_idx][gDelayedTicks].field_0_Inputs);
+            gPrevNetInputs_6F5B28.field_0_input[player_idx][gDelayedTicks].field_0_Inputs &= ~0x3FF000;
         }
     }
 }
@@ -1400,6 +1414,9 @@ EXPORT void ManageNetworkTimeAndHudPager_4DADA0()
             gHudTimerIdx_6F5860 = -1;
         }
     }
+
+    swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
+    gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
 }
 
 MATCH_FUNC(0x4DAF30)
@@ -1435,11 +1452,22 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
                 } while (gNetDisconnectPlayersBits_6F56B8);
             }
 
-            gCurrentNetInputs_6F57D8.field_0_inputs[gNetworkPlayerIdx_6F56C8].field_0_Inputs = gInputRecorder_67F8B0.get_input_bits_4CEAC0();
+            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_0_Inputs = gInputRecorder_67F8B0.get_input_bits_4CEAC0();
+            
             Net_Send_Our_Inputs_4DACB0();
             Draw_4DA7B0();
             Net_Receive_Players_Inputs_4DA9F0();
-            memcpy(&gPrevNetInputs_6F5B28, &gCurrentNetInputs_6F57D8, sizeof(gPrevNetInputs_6F5B28));
+            memcpy(&gPrevNetInputs_6F5B28, &gCurrentNetInputs_6F57D8, sizeof(Network_AllInputsBuffer));
+            
+            // shift input buffer array
+            for (u32 plyr_idx = 0; plyr_idx < MAX_PLAYERS; plyr_idx++)
+            {
+                if (gNetPlay_7071E8.field_758_n2.field_10_players[plyr_idx].field_0_in_use)
+                {
+                    memcpy(&gTmpInputBuffer, &gCurrentNetInputs_6F57D8, sizeof(Network_AllInputsBuffer));
+                    memcpy(&gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][1], &gTmpInputBuffer.field_0_input[plyr_idx][0], gDelayedTicks * sizeof(Network_InputData));
+                }
+            }
         }
         else
         {

@@ -2,6 +2,7 @@
 
 #include "Function.hpp"
 #include "Game.hpp"
+#include "network_data.hpp"
 // Included this way as a hack so > msvc6 can use these headers too as they've been removed in later versions.
 #include <VC98/Include/DPLAY.H>
 #include <VC98/Include/DPLOBBY.H>
@@ -135,32 +136,6 @@ struct Network_SessionList
     u32 field_5C4_session_count;
 };
 GTA2_ASSERT_SIZEOF_ALWAYS(Network_SessionList, 0x504);
-
-struct Network_Buffer
-{
-    void* field_0_data;
-    s32 field_4_len;
-};
-GTA2_ASSERT_SIZEOF_ALWAYS(Network_Buffer, 0x8);
-
-struct Network_InputData
-{
-    u32 field_0_Inputs;
-    u32 field_4_rng;
-};
-GTA2_ASSERT_SIZEOF_ALWAYS(Network_InputData, 0x8);
-
-struct Network_InputPacket
-{
-    Network_InputData field_0_inputs;
-    s32 field_8_id;
-    s32 field_C_len;
-    u8 field_10_used;
-    char_type field_11_game_tick; // mod 256
-    char_type field_12_unused;
-    char_type field_13_unused;
-};
-GTA2_ASSERT_SIZEOF_ALWAYS(Network_InputPacket, 0x14);
 
 struct PacketHandlerSlot
 {

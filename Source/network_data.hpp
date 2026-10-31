@@ -4,6 +4,9 @@
 #include "Game.hpp"
 #include "NetPlay.hpp"
 
+// maximum of 10 delayed ticks
+#define MAX_DELAYED_TICKS 8
+
 #pragma pack(push, 1)
 // What each player sends at the start of a network game, so everyone can check they run the same
 // game, data files and settings
@@ -29,11 +32,38 @@ struct SPacket
     void* field_1_pData;
 };
 
+struct Network_InputData
+{
+    u32 field_0_Inputs;
+    u32 field_4_rng;
+};
+
+struct Network_InputPacket
+{
+    Network_InputData field_0_inputs;
+    s32 field_8_id;
+    s32 field_C_len;
+    u8 field_10_used;
+    char_type field_11_game_tick; // mod 256
+    char_type field_12_unused;
+    char_type field_13_unused;
+};
+
 struct Network_PlayerInputs
 {
-    Network_InputData field_0_inputs[MAX_PLAYERS];
+    Network_InputData field_0_player[MAX_PLAYERS];
 };
-GTA2_ASSERT_SIZEOF_ALWAYS(Network_PlayerInputs, 0x30);
+
+struct Network_AllInputsBuffer
+{
+    Network_InputData field_0_input[MAX_PLAYERS][MAX_DELAYED_TICKS];
+};
+
+struct Network_Buffer
+{
+    void* field_0_data;
+    s32 field_4_len;
+};
 
 //   TODO: unify all packets using unions
 union ReceivedPacket
