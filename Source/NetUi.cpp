@@ -739,15 +739,15 @@ struct Network_UI_Control_Data_Array
 
         // Clear remaining array for windows 2:
 
-        data[GUEST_LOBBY_2][11].field_0_windowParams.field_0_x = 0;
-        data[GUEST_LOBBY_2][11].field_0_windowParams.field_4_y = 0;
-        data[GUEST_LOBBY_2][11].field_0_windowParams.field_8_w = 0;
-        data[GUEST_LOBBY_2][11].field_0_windowParams.field_C_h = 0;
-        data[GUEST_LOBBY_2][11].field_0_windowParams.field_10_hMenu = static_cast<HMENU>(NULL);
-        data[GUEST_LOBBY_2][11].field_0_windowParams.field_14_style = 0x0;
+        data[GUEST_LOBBY_2][11].field_0_windowParams.field_0_x = 230;
+        data[GUEST_LOBBY_2][11].field_0_windowParams.field_4_y = 410;
+        data[GUEST_LOBBY_2][11].field_0_windowParams.field_8_w = 270;
+        data[GUEST_LOBBY_2][11].field_0_windowParams.field_C_h = 30;
+        data[GUEST_LOBBY_2][11].field_0_windowParams.field_10_hMenu = reinterpret_cast<HMENU>(LABEL_TICK_DELAY_GUEST_1102);
+        data[GUEST_LOBBY_2][11].field_0_windowParams.field_14_style = 0x40000000;
         data[GUEST_LOBBY_2][11].field_0_windowParams.field_18_exStyle = 0x0;
-        strcpy(data[GUEST_LOBBY_2][11].field_1C_window_class_name, "0");
-        strcpy(data[GUEST_LOBBY_2][11].field_6C_gtx_string_name, "0");
+        strcpy(data[GUEST_LOBBY_2][11].field_1C_window_class_name, "STATIC");
+        strcpy(data[GUEST_LOBBY_2][11].field_6C_gtx_string_name, "");
 
         data[GUEST_LOBBY_2][12].field_0_windowParams.field_0_x = 0;
         data[GUEST_LOBBY_2][12].field_0_windowParams.field_4_y = 0;
@@ -1990,7 +1990,12 @@ void NetUi::ApplyHostGameSettings_51B810(const char_type* pData)
                 pSpeedText = GetString_519A00("netui10");
                 break;
         }
+
+        char pDelayText[16];
+        sprintf(pDelayText, "Delay: %d", pSettings->field_201A8_tick_delay);
+
         SetDlgItemTextA(field_2031C_dlg_hwnd, LABEL_GAME_SPEED_1055, pSpeedText);
+        SetDlgItemTextA(field_2031C_dlg_hwnd, LABEL_TICK_DELAY_GUEST_1102, pDelayText);
 
         SetJoinedGamePoliceEnabledText_51CD30(field_20088_game_settings.field_201A0_police_on, field_2031C_dlg_hwnd);
         SetJoinedGameTypeAndFragLimitText_51D0C0(field_20088_game_settings.field_20198_game_type,

@@ -55,6 +55,7 @@ enum Network_UI_Control_Ids
 
     TRACKBAR_DELAY_TICKS_1100 = 1100,
     LABEL_DELAY_TICKS_1101 = 1101,
+    LABEL_TICK_DELAY_GUEST_1102 = 1102,
 };
 
 struct Network_Enumerated_Map
