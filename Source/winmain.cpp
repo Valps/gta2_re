@@ -81,6 +81,8 @@ Network_Buffer gInputSendData_6F5B18;
 ReceivedPacket* gpInputBuffer_6F58C0;
 
 u32 gCurrentInputsBufferSize_6F58C4;
+u32 gWaitingBits = 0;
+
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
 DEFINE_GLOBAL(u32, gTotalNetworkTime_6F5980, 0x6F5980); // TODO: move
 DEFINE_GLOBAL(s32, gNetTimeLimit_6F573C, 0x6F573C); // TODO: move
@@ -1077,12 +1079,12 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
     SetPreviousInputsHistory(&gNetInputsHistory1_6F56E0, &gCurrentNetInputs_6F57D8);
 
     // Check which players we are waiting for
-    u32 waiting_bits = 0;
+    gWaitingBits = 0; //u32 waiting_bits = 0;
     for (u32 i = 0; i < GTA2_COUNTOF(gNetPlay_7071E8.field_758_n2.field_10_players); i++)
     {
         if (gNetPlay_7071E8.field_758_n2.field_10_players[i].field_0_in_use && i != gNetworkPlayerIdx_6F56C8)
         {
-            waiting_bits |= 1 << i;
+            gWaitingBits |= 1 << i;
         }
     }
 
@@ -1090,7 +1092,7 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
     gTotalNetworkTime_6F5980 = 0;
 
     // Do not execute next game tick until we receive all players inputs
-    while (waiting_bits)
+    while (gWaitingBits)
     {
         // Leave a window to escape the loop if player is trying to exit the game
         if (gGame_0x40_67E008->UpdateExitTimer_4B8C20())
@@ -1115,15 +1117,15 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
                     switch (gpInputBuffer_6F58C0->s_packet.field_0_subtype) // std_packet_subtype
                     {
                         case std_packet_subtype::GiveUp_1:
-                            waiting_bits &= ~(1 << reinterpret_cast<s32>(gpInputBuffer_6F58C0->s_packet.field_1_pData));
+                            gWaitingBits &= ~(1 << reinterpret_cast<s32>(gpInputBuffer_6F58C0->s_packet.field_1_pData));
                             gNetDisconnectPlayersBits_6F56B8 |= 1 << reinterpret_cast<s32>(gpInputBuffer_6F58C0->s_packet.field_1_pData);
                             break;
                         case std_packet_subtype::PlayerQuit_2:
-                            waiting_bits &= ~(1 << player_idx);
+                            gWaitingBits &= ~(1 << player_idx);
                             gNetDisconnectPlayersBits_6F56B8 |= 1 << player_idx;
                             break;
                         case std_packet_subtype::KickFromConnection_3:
-                            waiting_bits = 0;
+                            gWaitingBits = 0;
                             gPlayerQuit_6F5AEC = true;
                             break;
                         default:
@@ -1144,7 +1146,7 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
                             memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks - tick_diff], &gpInputBuffer_6F58C0->all_inputs_data[i], sizeof(Network_InputData));
                         }
                     }
-                    waiting_bits &= ~(1 << player_idx);
+                    gWaitingBits &= ~(1 << player_idx);
 
                     // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
                     remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng;
@@ -1169,28 +1171,28 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
 
         // Now manage those players we didn't received packets
 
-        if (timeGetTime() - start_time > 1000 && retries >= max_retries && waiting_bits)
+        if (timeGetTime() - start_time > 1000 && retries >= max_retries && gWaitingBits)
         {
             // Give up on the players that didn't answer
-            for (u32 j = 0; j < 6 && waiting_bits; j++)
+            for (u32 j = 0; j < 6 && gWaitingBits; j++)
             {
-                if (waiting_bits & (1 << j))
+                if (gWaitingBits & (1 << j))
                 {
-                    waiting_bits &= ~(1 << j);
+                    gWaitingBits &= ~(1 << j);
                     gNetDisconnectPlayersBits_6F56B8 |= 1 << j;
                     gNetPlay_7071E8.SendGiveUp_521DB0(j);
                     gTagGame_6F8450.field_20_bHasQuit[j] = 1;
                 }
             }
         }
-        else if (timeGetTime() - start_time > 1000 && waiting_bits)
+        else if (timeGetTime() - start_time > 1000 && gWaitingBits)
         {
             // Send previous inputs in case of lost packets
             start_time = timeGetTime();
             retries++;
             for (u8 k = 0; k < 6; k++)
             {
-                if (waiting_bits & (1 << k))
+                if (gWaitingBits & (1 << k))
                 {
                     NetSendOldInputs_4DA9B0(&gNetInputsHistory1_6F56E0.field_0_player[gNetworkPlayerIdx_6F56C8], 1, k);
                     NetSendOldInputs_4DA9B0(&gNetInputsHistory2_6F5798.field_0_player[gNetworkPlayerIdx_6F56C8], 2, k);
@@ -1533,8 +1535,8 @@ EXPORT bool RunGameFrame_4DA850()
         if (Time >= gMatchStartTime_6F5A28)
         {
             exit_requested = ExecuteGame_4DA780();
-            do_network_and_local_inputs_4DAF30();
             gMatchStartTime_6F5A28 = Time + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0();
+            do_network_and_local_inputs_4DAF30();
         }
     }
     else
