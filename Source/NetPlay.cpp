@@ -2251,7 +2251,7 @@ bool NetPlay::ReceiveGameMessage_521890(Network_Buffer* pOut, s32* pPlayerIdx, u
         }
         
 
-        bTimedOut = timeGetTime() - startTime > 500;
+        bTimedOut = timeGetTime() - startTime > 1; // 500
         if (bGotMessage)
         {
             break;
