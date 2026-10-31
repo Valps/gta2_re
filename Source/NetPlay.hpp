@@ -211,7 +211,7 @@ struct NetPlay
     EXPORT void SendAcknowledgment_521370();
     EXPORT bool WaitForPlayersSync_5213E0();
     EXPORT s32 CopyConnection_5215B0(u32 idx, u32* ppConnection, size_t* pLen);
-    EXPORT s32 SendToPlayer_521630(Network_Buffer* pSendData, s32 player_idx, char_type delayed_ticks);
+    EXPORT s32 SendToPlayer_521630(Network_Buffer* pSendData, s32 player_idx);
     EXPORT void Add_5216E0(Network_Buffer* pData, s32 id, char_type game_tick);
     EXPORT u32 GetOldestBufferedPacket_521770(Network_Buffer* pOut, char_type* pSeq, u32* pPlayerId);
     EXPORT void ResolvePlayerInput_521820(s32** ppData, s32 idx);

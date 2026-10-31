@@ -2034,7 +2034,7 @@ s32 NetPlay::CopyConnection_5215B0(u32 idx, u32* ppConnection, size_t* pLen)
 }
 
 MATCH_FUNC(0x521630)
-s32 NetPlay::SendToPlayer_521630(Network_Buffer* pSendData, s32 player_idx, char_type delayed_ticks)
+s32 NetPlay::SendToPlayer_521630(Network_Buffer* pSendData, s32 player_idx)
 {
     u32 dataLen;
     s32 pData;
@@ -2047,7 +2047,7 @@ s32 NetPlay::SendToPlayer_521630(Network_Buffer* pSendData, s32 player_idx, char
     pStru.field_D_data = pSendData->field_0_data;
     pStru.field_11_len = pSendData->field_4_len;
     NetPlay::MakeSendData_51F420(&pStru, &pData, &dataLen);
-    reinterpret_cast<char_type*>(pData)[1] = field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()] - delayed_ticks;
+    reinterpret_cast<char_type*>(pData)[1] = field_758_n2.field_8_packet_game_tick[GetPlayerIdx_409C40()]; // TODO: useless
     return field_5E4_pDPlay3->Send(field_5D8_player_id, field_758_n2.field_10_players[player_idx].field_10_player_id, 0, reinterpret_cast<void*>(pData), dataLen);
 }
 
@@ -2251,7 +2251,7 @@ bool NetPlay::ReceiveGameMessage_521890(Network_Buffer* pOut, s32* pPlayerIdx, u
         }
         
 
-        bTimedOut = timeGetTime() - startTime > 500;
+        bTimedOut = timeGetTime() - startTime > 1; // 500
         if (bGotMessage)
         {
             break;
