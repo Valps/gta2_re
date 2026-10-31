@@ -1475,9 +1475,9 @@ void CopyAndShiftPlayerInputs()
 
         if (plyr_idx != gNetworkPlayerIdx_6F56C8)
         {
-            gTmpInputBuffer.field_0_input[plyr_idx][0].field_0_Inputs = 0;
-            gTmpInputBuffer.field_0_input[plyr_idx][0].field_4_rng = 0;
-            gTmpInputBuffer.field_0_input[plyr_idx][0].field_8_tick = 0xFFFFFFFF;
+            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_0_Inputs = 0;
+            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_4_rng = 0;
+            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_8_tick = 0xFFFFFFFF;
         }
     }
 }
