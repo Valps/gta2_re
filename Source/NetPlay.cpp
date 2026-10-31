@@ -7,7 +7,7 @@
 #include "network_data.hpp"
 #include "winmain.hpp"
 
-DEFINE_GLOBAL(NetPlay, gNetPlay_7071E8, 0x7071E8);
+NetPlay gNetPlay_7071E8;
 DEFINE_GLOBAL_INIT(GUID, kGta2_DP_Guid_5FE928, {0x561E8920 COMMA 0x5C70 COMMA 0x11D2 COMMA {0xAD COMMA 0x00 COMMA 0x00 COMMA 0xA0 COMMA 0xC9 COMMA 0xB6 COMMA 0x13 COMMA 0x98}}, 0x5FE928);
 DEFINE_GLOBAL_ARRAY(s32, gLastPlayerInputs_6F8A4C, 6, 0x6F8A4C);
 DEFINE_GLOBAL_ARRAY(char_type, gLastPlayerInputSeq_6F8A64, 24, 0x6F8A64);
@@ -2241,7 +2241,7 @@ bool NetPlay::ReceiveGameMessage_521890(Network_Buffer* pOut, s32* pPlayerIdx, u
 }
 
 MATCH_FUNC(0x521b20)
-void NetPlay::SendToAll_521B20(Network_Buffer* pSendData)
+void NetPlay::SendPlayerInputsToAll_521B20(Network_Buffer* pSendData)
 {
     u32 dataLen;
     s32 pData;
