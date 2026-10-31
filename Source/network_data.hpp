@@ -70,6 +70,7 @@ struct Network_Buffer
 union ReceivedPacket
 {
     Network_InputData input_data;
+    Network_InputData all_inputs_data[MAX_DELAYED_TICKS];
     SPacket s_packet;
     Network_Buffer net_buffer;
 };

@@ -1167,6 +1167,7 @@ void NetPlay::MakeSendData_51F420(Packet_SubType_3* pPacket, s32* pData, u32* pD
 
                     case packet_subtype::PlayerInputs_3: // In-Game data?
                     {
+                        /*
                         s32 idx = GetPlayerIdx_409C40();
                         if (SeqDiff(pPacket->field_8_seq, gLastPlayerInputSeq_6F8A64[idx]) == 1 && gLastPlayerInputs_6F8A4C[idx] == *static_cast<s32*>(pPacket->field_D_data))
                         {
@@ -1193,6 +1194,11 @@ void NetPlay::MakeSendData_51F420(Packet_SubType_3* pPacket, s32* pData, u32* pD
                                 gLastPlayerInputSeq_6F8A64[GetPlayerIdx_409C40()] = pPacket->field_8_seq;
                             }
                         }
+                        */
+                        pBuffer[0] = pkt_data_type::PlayerInputsAndTick_1;
+                        pBuffer[1] = pPacket->field_8_seq;
+                        memcpy(pBuffer + 2, pPacket->field_D_data, pPacket->field_11_len);
+                        *pDataLen = pPacket->field_11_len + 2;
                         break;
                     }
 
@@ -2161,7 +2167,7 @@ bool NetPlay::ReceiveGameMessage_521890(Network_Buffer* pOut, s32* pPlayerIdx, u
             break;
         }
 
-        u32 slot;
+        u32 slot;/*
         if (bCheckBuffered && (slot = GetOldestBufferedPacket_521770(pOut, &receivedTick, reinterpret_cast<u32*>(pPlayerIdx))) != -1)
         {
             // The oldest buffered (out of order) packet
@@ -2227,7 +2233,23 @@ bool NetPlay::ReceiveGameMessage_521890(Network_Buffer* pOut, s32* pPlayerIdx, u
                     }
                 }
             }
+        }   */
+
+        
+        // No internal buffer this time: buffer is already on the data
+        if (Receive_51F010(&pData, &dataLen, &recvId, &senderId))
+        {
+            *packet_subtype = reinterpret_cast<u8*>(pData)[3];
+            Network_Game_Session* pN2 = &field_758_n2;
+            *pPlayerIdx = IndexOf_520E30(senderId, pN2);
+            if (*pPlayerIdx != 0xEEEEEEEE)
+            {
+                bGotMessage = true;
+                pOut->field_4_len = reinterpret_cast<u8*>(pData)[4];
+                pOut->field_0_data = reinterpret_cast<u8*>(pData) + 5;
+            }
         }
+        
 
         bTimedOut = timeGetTime() - startTime > 500;
         if (bGotMessage)

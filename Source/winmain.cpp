@@ -1103,6 +1103,9 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
         u32 packet_subtype;
         u32 remote_rng;
         u32 local_rng;
+        u32 oldest_local_tick;
+        u32 newest_local_tick;
+        s32 i;
         if (gNetPlay_7071E8.ReceiveGameMessage_521890(reinterpret_cast<Network_Buffer*>(&gpInputBuffer_6F58C0), &player_idx, &packet_subtype))
         {
             switch (packet_subtype)
@@ -1130,12 +1133,22 @@ EXPORT void Net_Receive_Players_Inputs_4DA9F0()
                     break;
                 }
                 case packet_subtype::PlayerInputs_3: // store player input for the latest/current tick
-                    memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][0], gpInputBuffer_6F58C0, gCurrentInputsBufferSize_6F58C4);
+                    oldest_local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
+                    newest_local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
+                    for (i = gDelayedTicks; i >= 0; i--)
+                    {
+                        u32 remote_tick = gpInputBuffer_6F58C0->all_inputs_data[i].field_8_tick;
+                        if (remote_tick >= oldest_local_tick && remote_tick <= newest_local_tick) // cut off too old/new inputs
+                        {
+                            u32 tick_diff = remote_tick - oldest_local_tick;
+                            memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks - tick_diff], &gpInputBuffer_6F58C0->all_inputs_data[i], sizeof(Network_InputData));
+                        }
+                    }
                     waiting_bits &= ~(1 << player_idx);
 
                     // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
-                    remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][0].field_4_rng;
-                    local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_rng;
+                    remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng;
+                    local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng;
                     if (bDo_sync_check_67D6C1 &&
                         local_rng != remote_rng)
                     {
@@ -1317,8 +1330,10 @@ EXPORT void Net_Send_Our_Inputs_4DACB0()
             // Send the inputs plus an rng value the other players check against
             s16 max = 100;
             gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_rng = gRng_6F6784.get_int_4F7AE0(max);
-            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0];
-            gInputSendData_6F5B18.field_4_len = sizeof(Network_InputData);
+            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_tick = gpRng_67AB34->get_cur_rng_41CFE0() + gDelayedTicks;
+            
+            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8];
+            gInputSendData_6F5B18.field_4_len = (1 + gDelayedTicks) * sizeof(Network_InputData); // delayed ticks + latest (in network) tick
         }
         else
         {
@@ -1461,7 +1476,6 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
             }
 
             gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_0_Inputs = gInputRecorder_67F8B0.get_input_bits_4CEAC0();
-            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_tick = gpRng_67AB34->get_cur_rng_41CFE0() + gDelayedTicks;
 
             Net_Send_Our_Inputs_4DACB0();
             Draw_4DA7B0();
