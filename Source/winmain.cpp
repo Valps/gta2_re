@@ -99,6 +99,9 @@ DWORD gPingTimeToUpdate = 500;
 
 DWORD gLastDrawTimeDuringWait;
 
+u32 gTickAttempts = 0;
+bool gNetworkStall = false; // Buffer was exhausted and we don't received inputs enough
+
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
 DEFINE_GLOBAL(u32, gTotalNetworkTime_6F5980, 0x6F5980); // TODO: move
 DEFINE_GLOBAL(s32, gNetTimeLimit_6F573C, 0x6F573C); // TODO: move
@@ -1051,7 +1054,8 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         }
 
         gLastDrawTimeDuringWait = timeGetTime();
-        //memset(&gLastPacketTime, 0, sizeof(gLastPacketTime));
+        gTickAttempts = 0;
+        gNetworkStall = false;
     }
     else
     {
@@ -1446,9 +1450,11 @@ void DrawNetworkDebug()
 {
     if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
     {
+        // Ticks delayed
         swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
         gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
-
+        
+        // Ping stuff
         DWORD CurrTime = timeGetTime();
         if (CurrTime > gPingDrawUpdateTime + gPingTimeToUpdate)
         {
@@ -1466,6 +1472,13 @@ void DrawNetworkDebug()
                 gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, ypos, gDebugFont_706600, 1);
                 ypos += 20;
             }
+        }
+
+        // Stall indicator
+        if (gNetworkStall)
+        {
+            swprintf(tmpBuff_67BD9C, L"Stall");
+            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 380, gDebugFont_706600, 1);
         }
     }
 }
@@ -1715,16 +1728,31 @@ EXPORT bool RunGameFrame_4DA850()
         if (Time >= gMatchStartTime_6F5A28 && gNextTickInputsPrepared)
         {
             gNextTickInputsPrepared = false;
+            gNetworkStall = false;
 
             exit_requested = ExecuteGame_4DA780();
             gMatchStartTime_6F5A28 = timeGetTime() + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0();
             do_network_and_local_inputs_4DAF30();
         }
-        else if (Time >= gLastDrawTimeDuringWait + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0())
+        else
         {
-            gLastDrawTimeDuringWait = timeGetTime();
-            Draw_4DA7B0();
+            if (Time >= gMatchStartTime_6F5A28)
+            {
+                if (!gNetworkStall)
+                {
+                    gNetworkStall = true;
+                    DrawNetworkDebug();
+                }
+            }
+
+            if (Time >= gLastDrawTimeDuringWait + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0())
+            {
+                gLastDrawTimeDuringWait = timeGetTime();
+                
+                Draw_4DA7B0();
+            }
         }
+        
     }
     else
     {
