@@ -1150,7 +1150,7 @@ void Net_StorePlayerInputs(s32 player_idx, ReceivedPacket* pInputPacket)
 }
 
 // This must be called in all game loop iterations
-void Receive_and_Interpret_Packets()
+void Net_Receive_Players_Inputs()
 {
     while (1)
     {
@@ -1575,7 +1575,7 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
 
             Net_Send_Our_Inputs_4DACB0();
             Draw_4DA7B0();
-            Receive_and_Interpret_Packets();
+            Net_Receive_Players_Inputs();
         }
         else
         {
@@ -1681,7 +1681,7 @@ EXPORT bool RunGameFrame_4DA850()
         CheckPlayersConnections();
         DisconnectPlayersNotInUse();
 
-        Receive_and_Interpret_Packets();
+        Net_Receive_Players_Inputs();
 
         if (!gNextTickInputsPrepared)
         {
