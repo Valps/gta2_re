@@ -92,6 +92,13 @@ u8 gRetries[MAX_PLAYERS];
 u8 gMaxRetries = 6;
 u32 gResendInterval = 200;
 
+DWORD gPlayersPing[MAX_PLAYERS]; // Updated every tick
+DWORD gPlayersFreezedPing[MAX_PLAYERS]; // Update once in a while
+DWORD gPingDrawUpdateTime;
+DWORD gPingTimeToUpdate = 500;
+
+DWORD gLastDrawTimeDuringWait;
+
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
 DEFINE_GLOBAL(u32, gTotalNetworkTime_6F5980, 0x6F5980); // TODO: move
 DEFINE_GLOBAL(s32, gNetTimeLimit_6F573C, 0x6F573C); // TODO: move
@@ -1030,12 +1037,20 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         gNetTimeSecondsOfCurrMin_6F58A0 = 0;
         gFramesOfCurrSecond_6F5858 = 0;
         gNetTimerFlashing_6F59C0 = 0;
-        gLastResendTime = timeGetTime();
+
+        DWORD CurrTime = timeGetTime();
+
+        gLastResendTime = CurrTime;
+        gPingDrawUpdateTime = CurrTime;
 
         for (u32 i = 0; i < MAX_PLAYERS; i++)
         {
-            gLastPacketTime[i] = gLastResendTime;
+            gLastPacketTime[i] = CurrTime;
+            gPlayersPing[i] = 0;
+            gPlayersFreezedPing[i] = 0;
         }
+
+        gLastDrawTimeDuringWait = timeGetTime();
         //memset(&gLastPacketTime, 0, sizeof(gLastPacketTime));
     }
     else
@@ -1148,10 +1163,6 @@ void Receive_and_Interpret_Packets()
         // Wait a packet. If one was received, analyse its data and do something
         s32 player_idx;
         u32 packet_subtype;
-        u32 remote_rng;
-        u32 local_rng;
-        u32 remote_tick;
-        u32 local_tick;
         //memset(&gpInputBuffer_6F58C0, 0, (1 + gDelayedTicks) * sizeof(Network_InputData));
         if (!gNetPlay_7071E8.ReceiveGameMessage_521890(reinterpret_cast<Network_Buffer*>(&gpInputBuffer_6F58C0), &player_idx, &packet_subtype))
         {
@@ -1185,7 +1196,7 @@ void Receive_and_Interpret_Packets()
             case packet_subtype::PlayerInputs_3: // store player input for the latest/current tick
 
                 Net_StorePlayerInputs(player_idx, gpInputBuffer_6F58C0);
-                
+                gPlayersPing[player_idx] = timeGetTime() - gLastPacketTime[player_idx];
                 gLastPacketTime[player_idx] = timeGetTime(); // Register time
                 break;
             default:
@@ -1413,7 +1424,33 @@ void CopyAndShiftPlayerInputs()
     }
 }
 
+void DrawNetworkDebug()
+{
+    if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
+    {
+        swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
 
+        DWORD CurrTime = timeGetTime();
+        if (CurrTime > gPingDrawUpdateTime + gPingTimeToUpdate)
+        {
+            gPingDrawUpdateTime = CurrTime;
+            memcpy(&gPlayersFreezedPing, &gPlayersPing, sizeof(gPlayersPing));
+        }
+
+        s16 ypos = 220;
+        for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+        {
+            if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
+                && player_idx != gNetworkPlayerIdx_6F56C8)
+            {
+                swprintf(tmpBuff_67BD9C, L"P%d Ping: %d", (player_idx + 1), gPlayersFreezedPing[player_idx]);
+                gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, ypos, gDebugFont_706600, 1);
+                ypos += 20;
+            }
+        }
+    }
+}
 
 MATCH_FUNC(0x4DADA0)
 EXPORT void ManageNetworkTimeAndHudPager_4DADA0()
@@ -1481,6 +1518,7 @@ EXPORT void ManageNetworkTimeAndHudPager_4DADA0()
                 {
                     gHudTimerIdx_6F5860 = gHud_2B00_706620->field_620_pagers.CreateTimer_5D31F0(gNetTimerSeconds_6F5944);
                 }
+                DrawNetworkDebug();
                 return;
             }
         }
@@ -1492,11 +1530,7 @@ EXPORT void ManageNetworkTimeAndHudPager_4DADA0()
         }
     }
 
-    if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
-    {
-        swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
-        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
-    }
+    DrawNetworkDebug();
 }
 
 void DisconnectPlayersNotInUse()
@@ -1667,6 +1701,11 @@ EXPORT bool RunGameFrame_4DA850()
             exit_requested = ExecuteGame_4DA780();
             gMatchStartTime_6F5A28 = timeGetTime() + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0();
             do_network_and_local_inputs_4DAF30();
+        }
+        else if (Time >= gLastDrawTimeDuringWait + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0())
+        {
+            gLastDrawTimeDuringWait = timeGetTime();
+            Draw_4DA7B0();
         }
     }
     else
