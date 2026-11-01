@@ -76,6 +76,7 @@ u32 gDelayedTicks;
 Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
 Network_AllInputsBuffer gPrevNetInputs_6F5B28;
 Network_AllInputsBuffer gTmpInputBuffer; // used only for shifting arrays
+Network_AllInputsBuffer gTmpReceivingInputBuffer;
 
 Network_Buffer gInputSendData_6F5B18;
 ReceivedPacket* gpInputBuffer_6F58C0;
@@ -1004,11 +1005,12 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
 
         InitializeInputBuffer();
         memset(&gPrevNetInputs_6F5B28, 0, sizeof(gPrevNetInputs_6F5B28));
+        memset(&gTmpReceivingInputBuffer, 0, sizeof(gTmpReceivingInputBuffer));
         memset(&gRetries, 0, sizeof(gRetries));
 
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
         gNetworkPlayerIdx_6F56C8 = gNetPlay_7071E8.GetPlayerIdx_409C40();
-        gpInputBuffer_6F58C0 = reinterpret_cast<ReceivedPacket*>(&gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0]);
+        gpInputBuffer_6F58C0 = reinterpret_cast<ReceivedPacket*>(&gTmpReceivingInputBuffer);
         gCurrentInputsBufferSize_6F58C4 = sizeof(Network_PlayerInputs); //0x30;
         dword_6F5B00 = 0;
         bRecordStartTime_6F593C = true;
@@ -1115,6 +1117,23 @@ void SetPreviousInputsHistory(Network_PlayerInputs* pHistory, Network_AllInputsB
     } 
 }
 
+void Net_StorePlayerInputs(s32 player_idx, ReceivedPacket* pInputPacket)
+{
+    for (u32 i = 0; i <= gDelayedTicks; i++)
+    {
+        Network_InputData* remote = &pInputPacket->all_inputs_data[i];
+        for (u32 j = 0; j <= gDelayedTicks; j++)
+        {
+            u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][j].field_8_tick;
+            if (remote->field_8_tick == local_tick)
+            {
+                memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][j], &pInputPacket->all_inputs_data[i], sizeof(Network_InputData));
+                break;
+            }
+        }
+    }
+}
+
 // This must be called in all game loop iterations
 void Receive_and_Interpret_Packets()
 {
@@ -1131,9 +1150,9 @@ void Receive_and_Interpret_Packets()
         u32 packet_subtype;
         u32 remote_rng;
         u32 local_rng;
-        u32 oldest_local_tick;
-        u32 newest_local_tick;
-        s32 i;
+        u32 remote_tick;
+        u32 local_tick;
+        //memset(&gpInputBuffer_6F58C0, 0, (1 + gDelayedTicks) * sizeof(Network_InputData));
         if (!gNetPlay_7071E8.ReceiveGameMessage_521890(reinterpret_cast<Network_Buffer*>(&gpInputBuffer_6F58C0), &player_idx, &packet_subtype))
         {
             break;
@@ -1164,36 +1183,10 @@ void Receive_and_Interpret_Packets()
                 break;
             }
             case packet_subtype::PlayerInputs_3: // store player input for the latest/current tick
-                oldest_local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
-                newest_local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_tick;
-                for (i = gDelayedTicks; i >= 0; i--)
-                {
-                    u32 remote_tick = gpInputBuffer_6F58C0->all_inputs_data[i].field_8_tick;
-                    if (remote_tick >= oldest_local_tick && remote_tick <= newest_local_tick) // cut off too old/new inputs
-                    {
-                        u32 tick_diff = remote_tick - oldest_local_tick;
-                        memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks - tick_diff], &gpInputBuffer_6F58C0->all_inputs_data[i], sizeof(Network_InputData));
-                    }
-                }
-                gWaitingBits &= ~(1 << player_idx);
+
+                Net_StorePlayerInputs(player_idx, gpInputBuffer_6F58C0);
+                
                 gLastPacketTime[player_idx] = timeGetTime(); // Register time
-
-                // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
-
-                if (gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_tick != 0xFFFFFFFF)
-                {
-                    remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng;
-                    local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng;
-                    if (bDo_sync_check_67D6C1 &&
-                        local_rng != remote_rng)
-                    {
-                        sprintf(gTmpBuffer_67C598, "Player %d: Sync error (random) remote=%d local=%d\nTick remote=%d local=%d", 
-                            (player_idx + 1), remote_rng, local_rng, 
-                            gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_tick, 
-                            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick);
-                        FatalErrorMsg_4DB410(gTmpBuffer_67C598);
-                    }
-                }
                 break;
             default:
                 FatalError_4A38C0(Gta2Error::InvalidLine, "C:\\Splitting\\Gta2\\Source\\main.cpp", 860, 0);
@@ -1207,6 +1200,11 @@ bool Net_HasInputsForNextTick()
     gWaitingBits = 0;
     u32 expected_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
     
+    if (expected_tick == 0xFFFFFFFF)
+    {
+        return false;
+    }
+
     for (u32 i = 0; i < MAX_PLAYERS; i++)
     {
         if (!gNetPlay_7071E8.field_758_n2.field_10_players[i].field_0_in_use 
@@ -1217,38 +1215,12 @@ bool Net_HasInputsForNextTick()
 
         u32 remote_tick = gCurrentNetInputs_6F57D8.field_0_input[i][gDelayedTicks].field_8_tick;
 
-        if (remote_tick != expected_tick)
+        if (remote_tick != expected_tick || remote_tick == 0xFFFFFFFF)
         {
             gWaitingBits |= (1 << i);
         }
     }
     return gWaitingBits == 0;
-}
-
-MATCH_FUNC(0x4DA9F0)
-EXPORT void Net_Receive_Players_Inputs_4DA9F0()
-{
-    s32 retries = 0;
-    s32 max_retries = bRecordStartTime_6F593C ? 25 : 6;
-
-    // Update previous stored inputs
-    memcpy(&gNetInputsHistory2_6F5798, &gNetInputsHistory1_6F56E0, sizeof(gNetInputsHistory2_6F5798));
-    SetPreviousInputsHistory(&gNetInputsHistory1_6F56E0, &gCurrentNetInputs_6F57D8);
-
-    // Check which players we are waiting for
-    gWaitingBits = 0; //u32 waiting_bits = 0;
-    for (u32 i = 0; i < GTA2_COUNTOF(gNetPlay_7071E8.field_758_n2.field_10_players); i++)
-    {
-        if (gNetPlay_7071E8.field_758_n2.field_10_players[i].field_0_in_use && i != gNetworkPlayerIdx_6F56C8)
-        {
-            gWaitingBits |= 1 << i;
-        }
-    }
-
-    u32 start_time = timeGetTime();
-    gTotalNetworkTime_6F5980 = 0;
-
-    Receive_and_Interpret_Packets();
 }
 
 // Sum of all the bytes of a file
@@ -1361,6 +1333,25 @@ EXPORT void __stdcall CompareRemotePlayers_4DB440(u8* pLocalSyncData, u8* pRemot
     }
 }
 
+// TODO: refactor with Net_Send_Our_Inputs_4DACB0
+void Net_ReSend_Our_Inputs()
+{
+    if (gNetPlay_7071E8.GetPlayerCount_461DA0() > 1)
+    {
+        if (bDo_sync_check_67D6C1)
+        {
+            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8];
+            gInputSendData_6F5B18.field_4_len = (1 + gDelayedTicks) * sizeof(Network_InputData); // delayed ticks + latest (in network) tick
+        }
+        else
+        {
+            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0];
+            gInputSendData_6F5B18.field_4_len = sizeof(u32);
+        }
+        gNetPlay_7071E8.SendPlayerInputsToAll_521B20(&gInputSendData_6F5B18);
+    }
+}
+
 MATCH_FUNC(0x4DACB0)
 EXPORT void Net_Send_Our_Inputs_4DACB0()
 {
@@ -1416,7 +1407,7 @@ void CopyAndShiftPlayerInputs()
         if (plyr_idx != gNetworkPlayerIdx_6F56C8)
         {
             gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_0_Inputs = 0;
-            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_4_rng = 0;
+            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_4_rng = 0xFFFFFFFF;
             gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_8_tick = 0xFFFFFFFF;
         }
     }
@@ -1550,8 +1541,7 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
 
             Net_Send_Our_Inputs_4DACB0();
             Draw_4DA7B0();
-            Receive_and_Interpret_Packets(); //Net_Receive_Players_Inputs_4DA9F0();
-            //CopyAndShiftPlayerInputs();
+            Receive_and_Interpret_Packets();
         }
         else
         {
@@ -1567,11 +1557,6 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
         {
             gGame_0x40_67E008->ExitGameNoBonus_4B8C00(0, GameExitType::PlayerQuit_2);
         }
-        /*else
-        {
-            Net_Set_Local_Player_Inputs_4DAD50();
-        }
-        */
         ++gNetworkFrameCounter_6F5868;
     }
     else
@@ -1610,6 +1595,34 @@ void CheckPlayersConnections()
     }
 }
 
+void Net_CheckPlayersRNG()
+{
+    // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
+    for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+    {
+        if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use)
+        {
+            u32 remote_tick = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_tick;
+            u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
+            
+            if (remote_tick != 0xFFFFFFFF && remote_tick == local_tick)
+            {
+                u32 remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng;
+                u32 local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng;
+                if (bDo_sync_check_67D6C1 &&
+                    local_rng != remote_rng)
+                {
+                    sprintf(gTmpBuffer_67C598, "Player %d: Sync error (random) remote=%d local=%d\nTick remote=%d local=%d", 
+                        (player_idx + 1), remote_rng, local_rng, 
+                        gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_tick, 
+                        gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick);
+                    FatalErrorMsg_4DB410(gTmpBuffer_67C598);
+                }
+            }
+        }
+    }
+}
+
 // todo move to another file for ordering
 MATCH_FUNC(0x4DA850)
 EXPORT bool RunGameFrame_4DA850()
@@ -1621,6 +1634,16 @@ EXPORT bool RunGameFrame_4DA850()
 
     if (bStartNetworkGame_7081F0)
     {
+        // Re-send packets periodically
+        if (gNetPlay_7071E8.CountActivePlayers_521350() > 1)
+        {
+            if (Time - gLastResendTime > gResendInterval)
+            {
+                Net_ReSend_Our_Inputs();
+                gLastResendTime = timeGetTime();
+            }
+        }
+
         CheckPlayersConnections();
         DisconnectPlayersNotInUse();
 
@@ -1630,6 +1653,7 @@ EXPORT bool RunGameFrame_4DA850()
         {
             if (Net_HasInputsForNextTick())
             {
+                Net_CheckPlayersRNG();
                 CopyAndShiftPlayerInputs();
                 Net_Set_Local_Player_Inputs_4DAD50();
                 gNextTickInputsPrepared = true;
@@ -1643,14 +1667,6 @@ EXPORT bool RunGameFrame_4DA850()
             exit_requested = ExecuteGame_4DA780();
             gMatchStartTime_6F5A28 = timeGetTime() + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0();
             do_network_and_local_inputs_4DAF30();
-        }
-        else if (gNetPlay_7071E8.CountActivePlayers_521350() > 1)
-        {
-            if (Time - gLastResendTime > gResendInterval)
-            {
-                Net_Send_Our_Inputs_4DACB0();
-                gLastResendTime = timeGetTime();
-            }
         }
     }
     else
