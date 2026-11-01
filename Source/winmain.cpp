@@ -1688,6 +1688,22 @@ void Net_CheckPlayersRNG()
     }
 }
 
+void Net_TryPrepareNextTick()
+{
+    gTickAttempts++;
+    if (!gNextTickInputsPrepared)
+    {
+        if (Net_HasInputsForNextTick())
+        {
+            Net_CheckPlayersRNG();
+            CopyAndShiftPlayerInputs();
+            Net_Set_Local_Player_Inputs_4DAD50();
+            gNextTickInputsPrepared = true;
+            gTickAttempts = 0;
+        }
+    }
+}
+
 // todo move to another file for ordering
 MATCH_FUNC(0x4DA850)
 EXPORT bool RunGameFrame_4DA850()
@@ -1714,16 +1730,7 @@ EXPORT bool RunGameFrame_4DA850()
 
         Net_Receive_Players_Inputs();
 
-        if (!gNextTickInputsPrepared)
-        {
-            if (Net_HasInputsForNextTick())
-            {
-                Net_CheckPlayersRNG();
-                CopyAndShiftPlayerInputs();
-                Net_Set_Local_Player_Inputs_4DAD50();
-                gNextTickInputsPrepared = true;
-            }
-        }
+        Net_TryPrepareNextTick();
 
         if (Time >= gMatchStartTime_6F5A28 && gNextTickInputsPrepared)
         {
