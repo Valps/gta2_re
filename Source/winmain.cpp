@@ -1265,6 +1265,7 @@ EXPORT void __stdcall MakeInitialSyncData_4DB2E0(u8* pSyncData)
     pData->field_1_flags = bLog_random_extra_67D5BC != 0;
     pData->field_1_flags |= bDo_sync_check_67D6C1 ? 2 : 0;
     pData->field_1_flags |= bLog_random_67D5FC ? 4 : 0;
+    pData->field_1_flags |= 8; // prototype flag
     pData->field_11_exe_a = -1;
     pData->field_15_exe_b = 0;
 
@@ -1318,8 +1319,25 @@ EXPORT void __stdcall CompareRemotePlayers_4DB440(u8* pLocalSyncData, u8* pRemot
     }
     if (pLocal->field_1_flags != pRemote->field_1_flags)
     {
-        sprintf(msg, "Player %s: Debug flags are different", name);
-        FatalErrorMsg_4DB410(msg);
+        u8 is_local_prototype = (pLocal->field_1_flags & 8) == 8;
+        u8 is_remote_prototype = (pRemote->field_1_flags & 8) == 8;
+        if (is_local_prototype != is_remote_prototype)
+        {
+            if (is_local_prototype == 1 && is_remote_prototype == 0)
+            {
+                sprintf(msg, "Player %s not using prototype EXE.", name);
+            }
+            else if (is_local_prototype == 0 && is_remote_prototype == 1)
+            {
+                sprintf(msg, "Local user is not using prototype EXE.");
+            }
+            FatalErrorMsg_4DB410(gTmpBuffer_67C598);
+        }
+        else
+        {
+            sprintf(msg, "Player %s: Debug flags are different", name);
+            FatalErrorMsg_4DB410(msg);
+        }
     }
     if (pLocal->field_5_map_size != pRemote->field_5_map_size)
     {
