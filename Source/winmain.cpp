@@ -2611,6 +2611,9 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
     _getcwd(gWorkingDir_707F64, 256);
 
     ParseCommandLine_4DA320(lpCmdLine);
+
+    bStartNetworkGame_7081F0 = 1; // Always network!
+
     if (!Start_NetworkGame_5E5A30(hInstance)) // start NetUI if multiplayer. Stays here while players don't click "start", "cancel" etc
     {
         ReleaseMutex(gMutex_707078);
