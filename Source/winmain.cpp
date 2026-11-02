@@ -1024,7 +1024,9 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
 
         InitializeInputBuffer();
         memset(&gPrevNetInputs_6F5B28, 0, sizeof(gPrevNetInputs_6F5B28));
+        memset(&gTmpInputBuffer, 0, sizeof(gTmpInputBuffer));
         memset(&gTmpReceivingInputBuffer, 0, sizeof(gTmpReceivingInputBuffer));
+        memset(&gSendingInputBuffer, 0, sizeof(gSendingInputBuffer));
         memset(&gRetries, 0, sizeof(gRetries));
 
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
