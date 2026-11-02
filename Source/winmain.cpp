@@ -72,8 +72,12 @@ DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
 //Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
 
-u32 gRemoteSimTick[MAX_PLAYERS];
-u32 gLocalSimTick = 0;
+#define PROTOTYPE_VERSION 1
+
+u32 gLocalSimTick = 0; // Last simulated tick (LST)
+u32 gRemoteSimTick[MAX_PLAYERS]; // Last remote simulated tick
+
+s32 gMaxSimulationLeadTicks;
 
 u32 gDelayedTicks;
 Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
@@ -1020,7 +1024,10 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
 
         InitializeInputBuffer();
         memset(&gPrevNetInputs_6F5B28, 0, sizeof(gPrevNetInputs_6F5B28));
+        memset(&gTmpInputBuffer, 0, sizeof(gTmpInputBuffer));
         memset(&gTmpReceivingInputBuffer, 0, sizeof(gTmpReceivingInputBuffer));
+        memset(&gSendingInputBuffer, 0, sizeof(gSendingInputBuffer));
+        memset(&gInputSendData_6F5B18, 0, sizeof(gInputSendData_6F5B18));
         memset(&gRetries, 0, sizeof(gRetries));
 
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
@@ -1059,9 +1066,15 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
             gRemoteSimTick[i] = 0;
         }
 
-        gLastDrawTimeDuringWait = timeGetTime();
+        gLastDrawTimeDuringWait = CurrTime;
         gTickAttempts = 0;
         gNetworkStall = false;
+
+        gMaxSimulationLeadTicks = gDelayedTicks - 1;
+        if (gMaxSimulationLeadTicks < 1)
+        {
+            gMaxSimulationLeadTicks = 1;
+        }
     }
     else
     {
@@ -1496,7 +1509,7 @@ void DrawNetworkDebug()
             }
         }
 
-        ypos = 380;
+        ypos += 20;//ypos = 380;
         for (player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
         {
             if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
@@ -1512,12 +1525,16 @@ void DrawNetworkDebug()
         if (gNetworkStall)
         {
             swprintf(tmpBuff_67BD9C, L"Stall");
-            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 180, gDebugFont_706600, 1);
+            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 300, 50, gDebugFont_706600, 1);
         }
 
         // Current Tick counter (avoid using gShow_cycle_67D6BD)
         swprintf(tmpBuff_67BD9C, L"%d", gpRng_67AB34->get_cur_rng_41CFE0() - 1);
         gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 0, 460, gDebugFont_706600, 1);
+
+        // Prototype version
+        swprintf(tmpBuff_67BD9C, L"Version 0.%d", PROTOTYPE_VERSION);
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 270, 450, gDebugFont_706600, 1);
     }
 }
 
@@ -1726,12 +1743,29 @@ void Net_CheckPlayersRNG()
     }
 }
 
+bool Net_CanAdvanceSimulation() // Avoid players too far ahead of others
+{
+    u32 slowest_tick = 0xFFFFEEEE;
+    for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+    {
+        if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
+            && player_idx != gNetworkPlayerIdx_6F56C8)
+        {
+            if (gRemoteSimTick[player_idx] < slowest_tick)
+            {
+                slowest_tick = gRemoteSimTick[player_idx];
+            }
+        }
+    }
+    return (gLocalSimTick + 1 <= slowest_tick + (u32)gMaxSimulationLeadTicks);
+}
+
 void Net_TryPrepareNextTick()
 {
     gTickAttempts++;
     if (!gNextTickInputsPrepared)
     {
-        if (Net_HasInputsForNextTick())
+        if (Net_HasInputsForNextTick() && Net_CanAdvanceSimulation())
         {
             Net_CheckPlayersRNG();
             CopyAndShiftPlayerInputs();
@@ -1781,6 +1815,7 @@ EXPORT bool RunGameFrame_4DA850()
         }
         else
         {
+            bool bStallCopy = gNetworkStall; // Draw_4DA7B0 must be called after DrawNetworkDebug, so use this flag
             if (Time >= gMatchStartTime_6F5A28)
             {
                 if (!gNetworkStall)
@@ -1793,8 +1828,10 @@ EXPORT bool RunGameFrame_4DA850()
             if (Time >= gLastDrawTimeDuringWait + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0())
             {
                 gLastDrawTimeDuringWait = timeGetTime();
-                
-                Draw_4DA7B0();
+                if (!bStallCopy && gNetworkStall)
+                {
+                    Draw_4DA7B0();
+                }
             }
         }
         
@@ -2580,6 +2617,9 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
     _getcwd(gWorkingDir_707F64, 256);
 
     ParseCommandLine_4DA320(lpCmdLine);
+
+    bStartNetworkGame_7081F0 = 1; // Always network!
+
     if (!Start_NetworkGame_5E5A30(hInstance)) // start NetUI if multiplayer. Stays here while players don't click "start", "cancel" etc
     {
         ReleaseMutex(gMutex_707078);

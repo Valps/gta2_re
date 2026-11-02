@@ -7,6 +7,8 @@
 #include <COMMCTRL.H>
 #include <direct.h>
 
+#define NO_PLAYER_NUMBER_CONSTRAINT 0xFFFFFF00
+
 DEFINE_GLOBAL(UINT_PTR, gTimerId_6F8A18, 0x6F8A18);
 DEFINE_GLOBAL_ARRAY(char_type, Dest_6F88A4, 256, 0x6F88A4);
 DEFINE_GLOBAL(s32, gChatLineCount_6F8A2C, 0x6F8A2C);
@@ -1039,7 +1041,7 @@ NetUi::NetUi()
     this->field_20088_game_settings.field_2018C_map_idx = 0;
     this->field_20088_game_settings.field_201A0_police_on = 0;
     this->field_20088_game_settings.field_201A4_game_time_limit = 0;
-    this->field_20088_game_settings.field_201A8_tick_delay = 0;
+    this->field_20088_game_settings.field_201A8_tick_delay = MIN_DELAY;
     memset(field_4_maps, 0, sizeof(field_4_maps));
     gtext_0x14_6F87F0 = new TextTable();
     gtext_0x14_6F87F0->Load_5B5E90();
@@ -1562,7 +1564,7 @@ void NetUi::CreateMainUi_51AA90(HWND hWndParent)
 
     // set range of game speed slider: 0 to 2 (that is, 3 options)
     SendDlgItemMessageA(hWndParent, TRACKBAR_GAME_SPEED_1031, TBM_SETRANGE, TRUE, MAKELONG(0, 2)); 
-    SendDlgItemMessageA(hWndParent, TRACKBAR_DELAY_TICKS_1100, TBM_SETRANGE, TRUE, MAKELONG(0, 5)); 
+    SendDlgItemMessageA(hWndParent, TRACKBAR_DELAY_TICKS_1100, TBM_SETRANGE, TRUE, MAKELONG(MIN_DELAY, MAX_DELAY)); // 0, 5
 
     SetDlgItemTextA(hWndParent, LABEL_COPS_1028, GetString_519A00("netui14")); // "Cops"
     SetDlgItemTextA(hWndParent, LABEL_TIME_LIMIT_MINUTES_1037, GetString_519A00("netui21")); // "Time Limit (Minutes)"
@@ -2282,7 +2284,16 @@ void NetUi::EnumerateMaps_51BFA0()
         GetPrivateProfileStringA("MapFiles", "SCRFile", "", maps[i].field_208_script_name, 0x103u, FileName);
         GetPrivateProfileStringA("MapFiles", "Description", "", maps[i].field_30C_description, 0x103u, FileName);
         GetPrivateProfileStringA("MapFiles", "PlayerCount", "", gTmpBuffer_67C598, 2u, FileName);
-        maps[i].field_514_player_count = atoi(gTmpBuffer_67C598);
+
+        if (strcmp(gTmpBuffer_67C598, "") == 0)
+        {
+            maps[i].field_514_player_count = NO_PLAYER_NUMBER_CONSTRAINT; // map doesn't constraint number of players
+        }
+        else
+        {
+            maps[i].field_514_player_count = atoi(gTmpBuffer_67C598);
+        }
+        
 
         // Only keep maps whose files all exist
         _chdir("data");
@@ -2449,14 +2460,22 @@ void NetUi::SetPlayerCountText_51CB30(s32 count, HWND hDlg)
 {
     char String[260];
     const char* pStr = GetString_519A00("netui13");
-    sprintf(String, "%s %d", pStr, count);
+    if (count == NO_PLAYER_NUMBER_CONSTRAINT)
+    {
+        sprintf(String, "%s 1", pStr);
+    }
+    else
+    {
+        sprintf(String, "%s %d", pStr, count);
+    }
     SetDlgItemTextA(hDlg, LABEL_PLAYERS_REQUIRED_1033, String);
 }
 
 MATCH_FUNC(0x51cbc0)
 void NetUi::UpdateButtonsEnabledState_51CBC0()
 {
-    if (NetUi::GetCount_51BBD0() == field_4_maps[field_20088_game_settings.field_2018C_map_idx].field_514_player_count)
+    u32 map_players_count = field_4_maps[field_20088_game_settings.field_2018C_map_idx].field_514_player_count;
+    if (NetUi::GetCount_51BBD0() == map_players_count || map_players_count == NO_PLAYER_NUMBER_CONSTRAINT)
     {
         EnableWindow(GetDlgItem(NetUi::Get_2031C_HWND_519E20(), BUTTON_START_GAME_1021), true);
     }

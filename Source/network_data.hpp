@@ -5,7 +5,9 @@
 #include "NetPlay.hpp"
 
 // maximum of 10 delayed ticks
-#define MAX_DELAYED_TICKS 8
+#define MAX_TICK_BUFFER_SIZE 8
+#define MIN_DELAY 2
+#define MAX_DELAY 3
 
 #pragma pack(push, 1)
 // What each player sends at the start of a network game, so everyone can check they run the same
@@ -57,13 +59,13 @@ struct Network_PlayerInputs
 
 struct Network_AllInputsBuffer
 {
-    Network_InputData field_0_input[MAX_PLAYERS][MAX_DELAYED_TICKS];
+    Network_InputData field_0_input[MAX_PLAYERS][MAX_TICK_BUFFER_SIZE];
 };
 
 struct Network_LocalInputsPacket
 {
     u32 LastSimulatedTick;
-    Network_InputData field_4_input[MAX_DELAYED_TICKS];
+    Network_InputData field_4_input[MAX_TICK_BUFFER_SIZE];
 };
 
 struct Network_Buffer
@@ -76,7 +78,7 @@ struct Network_Buffer
 union ReceivedPacket
 {
     Network_InputData input_data;
-    //Network_InputData all_inputs_data[MAX_DELAYED_TICKS];
+    //Network_InputData all_inputs_data[MAX_TICK_BUFFER_SIZE];
     Network_LocalInputsPacket all_inputs_data;
     SPacket s_packet;
     Network_Buffer net_buffer;
