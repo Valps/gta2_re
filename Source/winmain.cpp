@@ -72,8 +72,10 @@ DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
 //Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
 
-u32 gRemoteSimTick[MAX_PLAYERS];
-u32 gLocalSimTick = 0;
+u32 gLocalSimTick = 0; // Last simulated tick (LST)
+u32 gRemoteSimTick[MAX_PLAYERS]; // Last remote simulated tick
+
+s32 gMaxSimulationLeadTicks;
 
 u32 gDelayedTicks;
 Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
@@ -1059,9 +1061,15 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
             gRemoteSimTick[i] = 0;
         }
 
-        gLastDrawTimeDuringWait = timeGetTime();
+        gLastDrawTimeDuringWait = CurrTime;
         gTickAttempts = 0;
         gNetworkStall = false;
+
+        gMaxSimulationLeadTicks = gDelayedTicks - 1;
+        if (gMaxSimulationLeadTicks < 0)
+        {
+            gMaxSimulationLeadTicks = 0;
+        }
     }
     else
     {
@@ -1512,7 +1520,7 @@ void DrawNetworkDebug()
         if (gNetworkStall)
         {
             swprintf(tmpBuff_67BD9C, L"Stall");
-            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 180, gDebugFont_706600, 1);
+            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 300, 50, gDebugFont_706600, 1);
         }
 
         // Current Tick counter (avoid using gShow_cycle_67D6BD)
@@ -1726,12 +1734,29 @@ void Net_CheckPlayersRNG()
     }
 }
 
+bool Net_CanAdvanceSimulation() // Avoid players too far ahead of others
+{
+    u32 slowest_tick = 0xFFFFEEEE;
+    for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+    {
+        if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
+            && player_idx != gNetworkPlayerIdx_6F56C8)
+        {
+            if (gRemoteSimTick[player_idx] < slowest_tick)
+            {
+                slowest_tick = gRemoteSimTick[player_idx];
+            }
+        }
+    }
+    return (gLocalSimTick + 1 <= slowest_tick + (u32)gMaxSimulationLeadTicks);
+}
+
 void Net_TryPrepareNextTick()
 {
     gTickAttempts++;
     if (!gNextTickInputsPrepared)
     {
-        if (Net_HasInputsForNextTick())
+        if (Net_HasInputsForNextTick() && Net_CanAdvanceSimulation())
         {
             Net_CheckPlayersRNG();
             CopyAndShiftPlayerInputs();
