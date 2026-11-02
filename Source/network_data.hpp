@@ -60,6 +60,12 @@ struct Network_AllInputsBuffer
     Network_InputData field_0_input[MAX_PLAYERS][MAX_DELAYED_TICKS];
 };
 
+struct Network_LocalInputsPacket
+{
+    u32 LastSimulatedTick;
+    Network_InputData field_4_input[MAX_DELAYED_TICKS];
+};
+
 struct Network_Buffer
 {
     void* field_0_data;
@@ -70,7 +76,8 @@ struct Network_Buffer
 union ReceivedPacket
 {
     Network_InputData input_data;
-    Network_InputData all_inputs_data[MAX_DELAYED_TICKS];
+    //Network_InputData all_inputs_data[MAX_DELAYED_TICKS];
+    Network_LocalInputsPacket all_inputs_data;
     SPacket s_packet;
     Network_Buffer net_buffer;
 };
