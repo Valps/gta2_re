@@ -1815,6 +1815,7 @@ EXPORT bool RunGameFrame_4DA850()
         }
         else
         {
+            bool bStallCopy = gNetworkStall; // Draw_4DA7B0 must be called after DrawNetworkDebug, so use this flag
             if (Time >= gMatchStartTime_6F5A28)
             {
                 if (!gNetworkStall)
@@ -1827,8 +1828,10 @@ EXPORT bool RunGameFrame_4DA850()
             if (Time >= gLastDrawTimeDuringWait + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0())
             {
                 gLastDrawTimeDuringWait = timeGetTime();
-                
-                Draw_4DA7B0();
+                if (!bStallCopy && gNetworkStall)
+                {
+                    Draw_4DA7B0();
+                }
             }
         }
         
