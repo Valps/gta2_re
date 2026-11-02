@@ -7,6 +7,8 @@
 #include <COMMCTRL.H>
 #include <direct.h>
 
+#define NO_PLAYER_NUMBER_CONSTRAINT 0xFFFFFF00
+
 DEFINE_GLOBAL(UINT_PTR, gTimerId_6F8A18, 0x6F8A18);
 DEFINE_GLOBAL_ARRAY(char_type, Dest_6F88A4, 256, 0x6F88A4);
 DEFINE_GLOBAL(s32, gChatLineCount_6F8A2C, 0x6F8A2C);
@@ -2282,7 +2284,16 @@ void NetUi::EnumerateMaps_51BFA0()
         GetPrivateProfileStringA("MapFiles", "SCRFile", "", maps[i].field_208_script_name, 0x103u, FileName);
         GetPrivateProfileStringA("MapFiles", "Description", "", maps[i].field_30C_description, 0x103u, FileName);
         GetPrivateProfileStringA("MapFiles", "PlayerCount", "", gTmpBuffer_67C598, 2u, FileName);
-        maps[i].field_514_player_count = atoi(gTmpBuffer_67C598);
+
+        if (strcmp(gTmpBuffer_67C598, "") == 0)
+        {
+            maps[i].field_514_player_count = NO_PLAYER_NUMBER_CONSTRAINT; // map doesn't constraint number of players
+        }
+        else
+        {
+            maps[i].field_514_player_count = atoi(gTmpBuffer_67C598);
+        }
+        
 
         // Only keep maps whose files all exist
         _chdir("data");
@@ -2456,7 +2467,8 @@ void NetUi::SetPlayerCountText_51CB30(s32 count, HWND hDlg)
 MATCH_FUNC(0x51cbc0)
 void NetUi::UpdateButtonsEnabledState_51CBC0()
 {
-    if (NetUi::GetCount_51BBD0() == field_4_maps[field_20088_game_settings.field_2018C_map_idx].field_514_player_count)
+    u32 map_players_count = field_4_maps[field_20088_game_settings.field_2018C_map_idx].field_514_player_count;
+    if (NetUi::GetCount_51BBD0() == map_players_count || map_players_count == NO_PLAYER_NUMBER_CONSTRAINT)
     {
         EnableWindow(GetDlgItem(NetUi::Get_2031C_HWND_519E20(), BUTTON_START_GAME_1021), true);
     }
