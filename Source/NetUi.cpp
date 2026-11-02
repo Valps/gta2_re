@@ -2460,7 +2460,14 @@ void NetUi::SetPlayerCountText_51CB30(s32 count, HWND hDlg)
 {
     char String[260];
     const char* pStr = GetString_519A00("netui13");
-    sprintf(String, "%s %d", pStr, count);
+    if (count == NO_PLAYER_NUMBER_CONSTRAINT)
+    {
+        sprintf(String, "%s 1", pStr);
+    }
+    else
+    {
+        sprintf(String, "%s %d", pStr, count);
+    }
     SetDlgItemTextA(hDlg, LABEL_PLAYERS_REQUIRED_1033, String);
 }
 
