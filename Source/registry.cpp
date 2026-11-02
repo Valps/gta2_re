@@ -7,18 +7,18 @@
 #include <windows.h>
 #include "enums.hpp"
 
-HKEY kRegistryRootKey_625018 = HKEY_LOCAL_MACHINE; // Note: should be const, but can't be
+HKEY kRegistryRootKey_625018 = HKEY_CURRENT_USER; // Note: should be const, but can't be
 
 DEFINE_GLOBAL(Registry, gRegistry_6FF968, 0x6FF968);
 
 MATCH_FUNC(0x586A00)
 bool Registry::Open_Sound_Root_586A00(PHKEY phkResult)
 {
-    if (::RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\DMA Design Ltd\\GTA2\\Sound", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
+    if (::RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\DMA Design Ltd\\GTA2\\Sound", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
     {
         DWORD dwDisposition;
 
-        if (::RegCreateKeyExA(HKEY_LOCAL_MACHINE,
+        if (::RegCreateKeyExA(HKEY_CURRENT_USER,
                               "SOFTWARE\\DMA Design Ltd\\GTA2\\Sound",
                               0,
                               "",
@@ -126,9 +126,9 @@ MATCH_FUNC(0x586C60)
 bool Registry::Open_Debug_Root_586C60(PHKEY phkResult)
 {
     DWORD dwDisposition;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\DMA Design Ltd\\GTA2\\Debug", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\DMA Design Ltd\\GTA2\\Debug", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
     {
-        if (RegCreateKeyExA(HKEY_LOCAL_MACHINE,
+        if (RegCreateKeyExA(HKEY_CURRENT_USER,
                             "SOFTWARE\\DMA Design Ltd\\GTA2\\Debug",
                             0,
                             "",
@@ -149,9 +149,9 @@ MATCH_FUNC(0x586CD0)
 bool Registry::Open_Options_Root_586CD0(PHKEY phkResult)
 {
     DWORD dwDisposition;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\DMA Design Ltd\\GTA2\\Option", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\DMA Design Ltd\\GTA2\\Option", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
     {
-        if (RegCreateKeyExA(HKEY_LOCAL_MACHINE,
+        if (RegCreateKeyExA(HKEY_CURRENT_USER,
                             "SOFTWARE\\DMA Design Ltd\\GTA2\\Option",
                             0,
                             "",
@@ -172,9 +172,9 @@ MATCH_FUNC(0x586D40)
 bool Registry::Open_Control_Root_586D40(PHKEY phkResult)
 {
     DWORD dwDisposition;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\DMA Design Ltd\\GTA2\\Control", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\DMA Design Ltd\\GTA2\\Control", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
     {
-        if (RegCreateKeyExA(HKEY_LOCAL_MACHINE,
+        if (RegCreateKeyExA(HKEY_CURRENT_USER,
                             "SOFTWARE\\DMA Design Ltd\\GTA2\\Control",
                             0,
                             "",
@@ -195,9 +195,9 @@ MATCH_FUNC(0x586DB0)
 bool Registry::Open_Screen_Root_586DB0(PHKEY phkResult)
 {
     DWORD dwDisposition;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\DMA Design Ltd\\GTA2\\Screen", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\DMA Design Ltd\\GTA2\\Screen", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
     {
-        if (RegCreateKeyExA(HKEY_LOCAL_MACHINE,
+        if (RegCreateKeyExA(HKEY_CURRENT_USER,
                             "SOFTWARE\\DMA Design Ltd\\GTA2\\Screen",
                             0,
                             "",
@@ -566,10 +566,10 @@ void Registry::Set_Network_Setting_587730(const char_type* lpValueName, BYTE Dat
 MATCH_FUNC(0x5877A0)
 bool Registry::Open_Player_Root_5877A0(PHKEY phkResult)
 {
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\DMA Design Ltd\\GTA2\\Player", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\DMA Design Ltd\\GTA2\\Player", 0, KEY_ALL_ACCESS, phkResult) != ERROR_SUCCESS)
     {
         DWORD dwDisposition;
-        if (RegCreateKeyExA(HKEY_LOCAL_MACHINE,
+        if (RegCreateKeyExA(HKEY_CURRENT_USER,
                             "SOFTWARE\\DMA Design Ltd\\GTA2\\Player",
                             0,
                             "",
