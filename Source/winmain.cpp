@@ -72,6 +72,8 @@ DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
 //Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
 
+#define PROTOTYPE_VERSION 1
+
 u32 gLocalSimTick = 0; // Last simulated tick (LST)
 u32 gRemoteSimTick[MAX_PLAYERS]; // Last remote simulated tick
 
@@ -1526,6 +1528,10 @@ void DrawNetworkDebug()
         // Current Tick counter (avoid using gShow_cycle_67D6BD)
         swprintf(tmpBuff_67BD9C, L"%d", gpRng_67AB34->get_cur_rng_41CFE0() - 1);
         gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 0, 460, gDebugFont_706600, 1);
+
+        // Prototype version
+        swprintf(tmpBuff_67BD9C, L"Version 0.%d", PROTOTYPE_VERSION);
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 270, 450, gDebugFont_706600, 1);
     }
 }
 
