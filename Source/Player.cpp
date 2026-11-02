@@ -1010,7 +1010,7 @@ void Player::Hud_Controls_565890(u16 action)
                 }
                 break;
             case DIK_F8:
-                if (this->IsUser_41DC70())
+                if (this->IsUser_41DC70() && !bStartNetworkGame_7081F0)
                 {
                     Start_GTA2Manager_5E4DE0();
                 }
