@@ -1509,7 +1509,7 @@ void DrawNetworkDebug()
             }
         }
 
-        ypos = 380;
+        ypos += 20;//ypos = 380;
         for (player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
         {
             if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
