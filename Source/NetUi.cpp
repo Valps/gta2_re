@@ -1041,7 +1041,7 @@ NetUi::NetUi()
     this->field_20088_game_settings.field_2018C_map_idx = 0;
     this->field_20088_game_settings.field_201A0_police_on = 0;
     this->field_20088_game_settings.field_201A4_game_time_limit = 0;
-    this->field_20088_game_settings.field_201A8_tick_delay = 0;
+    this->field_20088_game_settings.field_201A8_tick_delay = MIN_DELAY;
     memset(field_4_maps, 0, sizeof(field_4_maps));
     gtext_0x14_6F87F0 = new TextTable();
     gtext_0x14_6F87F0->Load_5B5E90();
@@ -1564,7 +1564,7 @@ void NetUi::CreateMainUi_51AA90(HWND hWndParent)
 
     // set range of game speed slider: 0 to 2 (that is, 3 options)
     SendDlgItemMessageA(hWndParent, TRACKBAR_GAME_SPEED_1031, TBM_SETRANGE, TRUE, MAKELONG(0, 2)); 
-    SendDlgItemMessageA(hWndParent, TRACKBAR_DELAY_TICKS_1100, TBM_SETRANGE, TRUE, MAKELONG(0, 5)); 
+    SendDlgItemMessageA(hWndParent, TRACKBAR_DELAY_TICKS_1100, TBM_SETRANGE, TRUE, MAKELONG(MIN_DELAY, MAX_DELAY)); // 0, 5
 
     SetDlgItemTextA(hWndParent, LABEL_COPS_1028, GetString_519A00("netui14")); // "Cops"
     SetDlgItemTextA(hWndParent, LABEL_TIME_LIMIT_MINUTES_1037, GetString_519A00("netui21")); // "Time Limit (Minutes)"
