@@ -72,11 +72,16 @@ DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
 //Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
 
+u32 gRemoteSimTick[MAX_PLAYERS];
+u32 gLocalSimTick = 0;
+
 u32 gDelayedTicks;
 Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
 Network_AllInputsBuffer gPrevNetInputs_6F5B28;
 Network_AllInputsBuffer gTmpInputBuffer; // used only for shifting arrays
-Network_AllInputsBuffer gTmpReceivingInputBuffer;
+
+Network_LocalInputsPacket gTmpReceivingInputBuffer;
+Network_LocalInputsPacket gSendingInputBuffer;
 
 Network_Buffer gInputSendData_6F5B18;
 ReceivedPacket* gpInputBuffer_6F58C0;
@@ -1051,6 +1056,7 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
             gLastPacketTime[i] = CurrTime;
             gPlayersPing[i] = 0;
             gPlayersFreezedPing[i] = 0;
+            gRemoteSimTick[i] = 0;
         }
 
         gLastDrawTimeDuringWait = timeGetTime();
@@ -1140,13 +1146,13 @@ void Net_StorePlayerInputs(s32 player_idx, ReceivedPacket* pInputPacket)
 {
     for (u32 i = 0; i <= gDelayedTicks; i++)
     {
-        Network_InputData* remote = &pInputPacket->all_inputs_data[i];
+        Network_InputData* remote = &pInputPacket->all_inputs_data.field_4_input[i];
         for (u32 j = 0; j <= gDelayedTicks; j++)
         {
             u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][j].field_8_tick;
             if (remote->field_8_tick == local_tick)
             {
-                memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][j], &pInputPacket->all_inputs_data[i], sizeof(Network_InputData));
+                memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][j], &pInputPacket->all_inputs_data.field_4_input[i], sizeof(Network_InputData));
                 break;
             }
         }
@@ -1200,8 +1206,13 @@ void Net_Receive_Players_Inputs()
             case packet_subtype::PlayerInputs_3: // store player input for the latest/current tick
 
                 Net_StorePlayerInputs(player_idx, gpInputBuffer_6F58C0);
+
+                // Time stuff
                 gPlayersPing[player_idx] = timeGetTime() - gLastPacketTime[player_idx];
                 gLastPacketTime[player_idx] = timeGetTime(); // Register time
+
+                // Execution:
+                gRemoteSimTick[player_idx] = gpInputBuffer_6F58C0->all_inputs_data.LastSimulatedTick;
                 break;
             default:
                 FatalError_4A38C0(Gta2Error::InvalidLine, "C:\\Splitting\\Gta2\\Source\\main.cpp", 860, 0);
@@ -1373,8 +1384,11 @@ void Net_ReSend_Our_Inputs()
     {
         if (bDo_sync_check_67D6C1)
         {
-            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8];
-            gInputSendData_6F5B18.field_4_len = (1 + gDelayedTicks) * sizeof(Network_InputData); // delayed ticks + latest (in network) tick
+            memcpy(&gSendingInputBuffer.field_4_input, &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8], (1 + gDelayedTicks) * sizeof(Network_InputData));
+            gSendingInputBuffer.LastSimulatedTick = gLocalSimTick;
+
+            gInputSendData_6F5B18.field_0_data = &gSendingInputBuffer;
+            gInputSendData_6F5B18.field_4_len = sizeof(u32) + ((1 + gDelayedTicks) * sizeof(Network_InputData)); // delayed ticks + latest (in network) tick
         }
         else
         {
@@ -1396,9 +1410,15 @@ EXPORT void Net_Send_Our_Inputs_4DACB0()
             s16 max = 100;
             gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_rng = gRng_6F6784.get_int_4F7AE0(max);
             gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_tick = gpRng_67AB34->get_cur_rng_41CFE0() + gDelayedTicks;
+
+            gLocalSimTick = gpRng_67AB34->get_cur_rng_41CFE0();
+
+            memcpy(&gSendingInputBuffer.field_4_input, &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8], (1 + gDelayedTicks) * sizeof(Network_InputData));
             
-            gInputSendData_6F5B18.field_0_data = &gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8];
-            gInputSendData_6F5B18.field_4_len = (1 + gDelayedTicks) * sizeof(Network_InputData); // delayed ticks + latest (in network) tick
+            gSendingInputBuffer.LastSimulatedTick = gLocalSimTick;
+
+            gInputSendData_6F5B18.field_0_data = &gSendingInputBuffer;
+            gInputSendData_6F5B18.field_4_len = sizeof(u32) + ((1 + gDelayedTicks) * sizeof(Network_InputData)); // delayed ticks + latest (in network) tick + last tick executed in simulation
         }
         else
         {
@@ -1450,6 +1470,7 @@ void DrawNetworkDebug()
 {
     if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
     {
+        gHud_2B00_706620->field_650_texts.RemoveExpired_5D2050(); // Remove old text on screen
         // Ticks delayed
         swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
         gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
@@ -1463,7 +1484,8 @@ void DrawNetworkDebug()
         }
 
         s16 ypos = 220;
-        for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+        u32 player_idx = 0;
+        for (; player_idx < MAX_PLAYERS; player_idx++)
         {
             if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
                 && player_idx != gNetworkPlayerIdx_6F56C8)
@@ -1474,12 +1496,28 @@ void DrawNetworkDebug()
             }
         }
 
+        ypos = 380;
+        for (player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
+        {
+            if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use 
+                && player_idx != gNetworkPlayerIdx_6F56C8)
+            {
+                swprintf(tmpBuff_67BD9C, L"P%d LST: %d", (player_idx + 1), gRemoteSimTick[player_idx]);
+                gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, ypos, gDebugFont_706600, 1);
+                ypos += 20;
+            }
+        }
+
         // Stall indicator
         if (gNetworkStall)
         {
             swprintf(tmpBuff_67BD9C, L"Stall");
-            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 380, gDebugFont_706600, 1);
+            gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 180, gDebugFont_706600, 1);
         }
+
+        // Current Tick counter (avoid using gShow_cycle_67D6BD)
+        swprintf(tmpBuff_67BD9C, L"%d", gpRng_67AB34->get_cur_rng_41CFE0() - 1);
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 0, 460, gDebugFont_706600, 1);
     }
 }
 
@@ -2631,7 +2669,7 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
         {
             InitializeGame_4DA4D0();
             bDo_sync_check_67D6C1 = true; // TODO: remove these later
-            gShow_cycle_67D6BD = true;
+            gShow_cycle_67D6BD = false;
             if (bStartNetworkGame_7081F0 && !gNetPlay_7071E8.WaitForPlayersSync_5213E0())
             {
                 CoUninitialize();
