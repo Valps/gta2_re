@@ -1066,9 +1066,9 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         gNetworkStall = false;
 
         gMaxSimulationLeadTicks = gDelayedTicks - 1;
-        if (gMaxSimulationLeadTicks < 0)
+        if (gMaxSimulationLeadTicks < 1)
         {
-            gMaxSimulationLeadTicks = 0;
+            gMaxSimulationLeadTicks = 1;
         }
     }
     else
