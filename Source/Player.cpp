@@ -58,6 +58,8 @@ DEFINE_GLOBAL_INIT(Ang16, kMaxTurnSpeed_6FE700, Ang16(48), 0x6FE700);
 DEFINE_GLOBAL_INIT(Fix16, kOne_6FE614, Fix16(1), 0x6FE614);
 DEFINE_GLOBAL_INIT(Fix16, k_instant_gang_radius_6FE634, Fix16(8), 0x6FE634);
 
+extern bool bDrawNetworkDebugInfo;
+
 struct UnknownDebugClass
 {
     EXPORT void DoTest_5B2640(u16 action);
@@ -1010,9 +1012,16 @@ void Player::Hud_Controls_565890(u16 action)
                 }
                 break;
             case DIK_F8:
-                if (this->IsUser_41DC70() && !bStartNetworkGame_7081F0)
+                if (this->IsUser_41DC70())
                 {
-                    Start_GTA2Manager_5E4DE0();
+                    if (!bStartNetworkGame_7081F0)
+                    {
+                        Start_GTA2Manager_5E4DE0();
+                    }
+                    else
+                    {
+                        bDrawNetworkDebugInfo = (bDrawNetworkDebugInfo == 0);
+                    }
                 }
                 break;
             case DIK_F9:

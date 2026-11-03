@@ -111,6 +111,8 @@ DWORD gLastDrawTimeDuringWait;
 u32 gTickAttempts = 0;
 bool gNetworkStall = false; // Buffer was exhausted and we don't received inputs enough
 
+bool bDrawNetworkDebugInfo = false;
+
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
 DEFINE_GLOBAL(u32, gTotalNetworkTime_6F5980, 0x6F5980); // TODO: move
 DEFINE_GLOBAL(s32, gNetTimeLimit_6F573C, 0x6F573C); // TODO: move
@@ -1481,6 +1483,10 @@ void CopyAndShiftPlayerInputs()
 
 void DrawNetworkDebug()
 {
+    if (!bDrawNetworkDebugInfo)
+    {
+        return;
+    }
     if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
     {
         gHud_2B00_706620->field_650_texts.RemoveExpired_5D2050(); // Remove old text on screen
