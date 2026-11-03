@@ -991,7 +991,7 @@ void InitializeInputBuffer() // Pretend that the first game inputs were given to
         {
             for (u32 tick = 0; tick <= gDelayedTicks; tick++)
             {
-                gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks - tick].field_8_tick = tick;
+                gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks - tick].field_4_tick = tick;
             }
         }
     }
@@ -1164,8 +1164,8 @@ void Net_StorePlayerInputs(s32 player_idx, ReceivedPacket* pInputPacket)
         Network_InputData* remote = &pInputPacket->all_inputs_data.field_4_input[i];
         for (u32 j = 0; j <= gDelayedTicks; j++)
         {
-            u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][j].field_8_tick;
-            if (remote->field_8_tick == local_tick)
+            u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][j].field_4_tick;
+            if (remote->field_4_tick == local_tick)
             {
                 memcpy(&gCurrentNetInputs_6F57D8.field_0_input[player_idx][j], &pInputPacket->all_inputs_data.field_4_input[i], sizeof(Network_InputData));
                 break;
@@ -1188,7 +1188,6 @@ void Net_Receive_Players_Inputs()
         // Wait a packet. If one was received, analyse its data and do something
         s32 player_idx;
         u32 packet_subtype;
-        //memset(&gpInputBuffer_6F58C0, 0, (1 + gDelayedTicks) * sizeof(Network_InputData));
         if (!gNetPlay_7071E8.ReceiveGameMessage_521890(reinterpret_cast<Network_Buffer*>(&gpInputBuffer_6F58C0), &player_idx, &packet_subtype))
         {
             break;
@@ -1242,7 +1241,7 @@ void Net_Receive_Players_Inputs()
 bool Net_HasInputsForNextTick()
 {
     gWaitingBits = 0;
-    u32 expected_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
+    u32 expected_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_tick;
     
     if (expected_tick == 0xFFFFFFFF)
     {
@@ -1257,7 +1256,7 @@ bool Net_HasInputsForNextTick()
             continue;
         }
 
-        u32 remote_tick = gCurrentNetInputs_6F57D8.field_0_input[i][gDelayedTicks].field_8_tick;
+        u32 remote_tick = gCurrentNetInputs_6F57D8.field_0_input[i][gDelayedTicks].field_4_tick;
 
         if (remote_tick != expected_tick || remote_tick == 0xFFFFFFFF)
         {
@@ -1426,8 +1425,8 @@ EXPORT void Net_Send_Our_Inputs_4DACB0()
         {
             // Send the inputs plus an rng value the other players check against
             s16 max = 100;
-            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_rng = gRng_6F6784.get_int_4F7AE0(max);
-            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_tick = gpRng_67AB34->get_cur_rng_41CFE0() + gDelayedTicks;
+            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_8_rng = (s8)gRng_6F6784.get_int_4F7AE0(max);
+            gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][0].field_4_tick = gpRng_67AB34->get_cur_rng_41CFE0() + gDelayedTicks;
 
             gLocalSimTick = gpRng_67AB34->get_cur_rng_41CFE0();
 
@@ -1478,8 +1477,8 @@ void CopyAndShiftPlayerInputs()
         if (plyr_idx != gNetworkPlayerIdx_6F56C8)
         {
             gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_0_Inputs = 0;
-            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_4_rng = 0xFFFFFFFF;
-            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_8_tick = 0xFFFFFFFF;
+            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_4_tick = 0xFFFFFFFF;
+            gCurrentNetInputs_6F57D8.field_0_input[plyr_idx][0].field_8_rng = -1;
         }
     }
 }
@@ -1731,20 +1730,20 @@ void Net_CheckPlayersRNG()
     {
         if (gNetPlay_7071E8.field_758_n2.field_10_players[player_idx].field_0_in_use)
         {
-            u32 remote_tick = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_tick;
-            u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick;
+            u32 remote_tick = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_tick;
+            u32 local_tick = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_tick;
             
             if (remote_tick != 0xFFFFFFFF && remote_tick == local_tick)
             {
-                u32 remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_rng;
-                u32 local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_rng;
+                s8 remote_rng = gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_rng;
+                s8 local_rng = gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_rng;
                 if (bDo_sync_check_67D6C1 &&
                     local_rng != remote_rng)
                 {
                     sprintf(gTmpBuffer_67C598, "Player %d: Sync error (random) remote=%d local=%d\nTick remote=%d local=%d", 
                         (player_idx + 1), remote_rng, local_rng, 
-                        gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_8_tick, 
-                        gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_8_tick);
+                        gCurrentNetInputs_6F57D8.field_0_input[player_idx][gDelayedTicks].field_4_tick, 
+                        gCurrentNetInputs_6F57D8.field_0_input[gNetworkPlayerIdx_6F56C8][gDelayedTicks].field_4_tick);
                     FatalErrorMsg_4DB410(gTmpBuffer_67C598);
                 }
             }
