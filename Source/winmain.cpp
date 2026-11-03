@@ -96,7 +96,7 @@ bool gNextTickInputsPrepared = false;
 
 DWORD gLastPacketTime[MAX_PLAYERS]; // Use this for managing timeouts
 DWORD gPlayerPacketTimeout = 10000; // 10 seconds
-DWORD gLastResendTime;
+DWORD gLastResendTime; // also used for measuring ping
 u8 gRetries[MAX_PLAYERS];
 u8 gMaxRetries = 6;
 u32 gResendInterval = 200;
@@ -1196,6 +1196,10 @@ void Net_Receive_Players_Inputs()
 
         switch (packet_subtype)
         {
+            case packet_subtype::Ping_1:
+                gPlayersPing[player_idx] = timeGetTime() - gLastResendTime;
+                break;
+
             case packet_subtype::StandardPacket_2:
             {
                 switch (gpInputBuffer_6F58C0->s_packet.field_0_subtype) // std_packet_subtype
@@ -1223,7 +1227,6 @@ void Net_Receive_Players_Inputs()
                 Net_StorePlayerInputs(player_idx, gpInputBuffer_6F58C0);
 
                 // Time stuff
-                gPlayersPing[player_idx] = timeGetTime() - gLastPacketTime[player_idx];
                 gLastPacketTime[player_idx] = timeGetTime(); // Register time
 
                 // Execution:
@@ -1799,6 +1802,7 @@ EXPORT bool RunGameFrame_4DA850()
             if (Time - gLastResendTime > gResendInterval)
             {
                 Net_ReSend_Our_Inputs();
+                gNetPlay_7071E8.SendPing_51EF60();
                 gLastResendTime = timeGetTime();
             }
         }
