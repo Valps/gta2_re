@@ -72,7 +72,7 @@ DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
 //Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
 
-#define PROTOTYPE_VERSION 1
+#define PROTOTYPE_VERSION 2
 
 u32 gLocalSimTick = 0; // Last simulated tick (LST)
 u32 gRemoteSimTick[MAX_PLAYERS]; // Last remote simulated tick
