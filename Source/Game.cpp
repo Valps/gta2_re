@@ -526,7 +526,7 @@ void Game::UpdateGame_4B9410()
 
     gTileAnim_2_7052C4->UpdateTileAnimations_5BC310();
 
-    if (bDo_show_timing_67D6DC)
+    if (bDo_show_timing_67D6DC && !bStartNetworkGame_7081F0)
     {
         gFpsCounter_7055D4->ShowFps_5BEC30();
     }

@@ -9,13 +9,20 @@
 DEFINE_GLOBAL(FpsCounter*, gFpsCounter_7055D4, 0x7055D4);
 
 EXTERN_GLOBAL_ARRAY(wchar_t, tmpBuff_67BD9C, 640);
-
+EXTERN_GLOBAL(s32, bStartNetworkGame_7081F0);
 
 MATCH_FUNC(0x5BEC30)
 void FpsCounter::ShowFps_5BEC30()
 {
     swprintf(tmpBuff_67BD9C, L"%d/%d fps", field_8_update_fps, field_14_draw_fps);
-    gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 0, 0, gDebugFont_706600, 1);
+    if (bStartNetworkGame_7081F0)
+    {
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 110, 450, gDebugFont_706600, 1);
+    }
+    else
+    {
+        gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 0, 0, gDebugFont_706600, 1);
+    }
 }
 
 MATCH_FUNC(0x5BEC70)

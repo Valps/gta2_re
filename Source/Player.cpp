@@ -1021,6 +1021,7 @@ void Player::Hud_Controls_565890(u16 action)
                     else
                     {
                         bDrawNetworkDebugInfo = (bDrawNetworkDebugInfo == 0);
+                        bDo_show_timing_67D6DC = (bDo_show_timing_67D6DC == 0);
                     }
                 }
                 break;

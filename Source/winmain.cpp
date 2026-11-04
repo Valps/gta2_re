@@ -1492,6 +1492,13 @@ void DrawNetworkDebug()
     if (gHud_2B00_706620->field_650_texts.field_964_pFreeList)
     {
         gHud_2B00_706620->field_650_texts.RemoveExpired_5D2050(); // Remove old text on screen
+        
+        // FPS
+        if (bDo_show_timing_67D6DC)
+        {
+            gFpsCounter_7055D4->ShowFps_5BEC30();
+        }
+
         // Ticks delayed
         swprintf(tmpBuff_67BD9C, L"Delay: %d", gDelayedTicks);
         gHud_2B00_706620->field_650_texts.DisplayText_5D1F50(tmpBuff_67BD9C, 10, 200, gDebugFont_706600, 1);
@@ -1821,6 +1828,8 @@ EXPORT bool RunGameFrame_4DA850()
             exit_requested = ExecuteGame_4DA780();
             gMatchStartTime_6F5A28 = timeGetTime() + gGame_0x40_67E008->GetFrameDurationMs_4B8BB0();
             do_network_and_local_inputs_4DAF30();
+            updated_logic = true;
+            drew_frame = true;
         }
         else
         {
@@ -1840,6 +1849,7 @@ EXPORT bool RunGameFrame_4DA850()
                 if (!bStallCopy && gNetworkStall)
                 {
                     Draw_4DA7B0();
+                    drew_frame = true;
                 }
             }
         }
@@ -2717,8 +2727,14 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
         else
         {
             InitializeGame_4DA4D0();
-            bDo_sync_check_67D6C1 = true; // TODO: remove these later
-            gShow_cycle_67D6BD = false;
+            
+            if (bStartNetworkGame_7081F0) // Prototype exclusive
+            {
+                bDo_sync_check_67D6C1 = true; // TODO: remove these later
+                gShow_cycle_67D6BD = false;
+                bDo_show_timing_67D6DC = false;
+            }
+
             if (bStartNetworkGame_7081F0 && !gNetPlay_7071E8.WaitForPlayersSync_5213E0())
             {
                 CoUninitialize();
