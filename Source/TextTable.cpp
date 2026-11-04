@@ -64,6 +64,27 @@ u16 TextTable::RemapExtendedChar_5B58D0(u16 ch) const
     return result;
 }
 
+u16 TextTable::RemapExtendedCharToLower_5B58D0(u16 ch) const
+{
+    u16 result = ch;
+    if (ch >= 128u)
+    {
+        if (ch >= 256u)
+        {
+            result = '?';
+        }
+        else
+        {
+            result = field_10_lang_code == 'r' ? kExtendedRussianCharMap_626490[ch - 128] : kExtendedWesternCharMap[ch - 128];
+            if (!result)
+            {
+                result = '?';
+            }
+        }
+    }
+    return tolower(result);
+}
+
 MATCH_FUNC(0x5B5910)
 void TextTable::RemapExtendedCharsIfNotJapanese_5B5910(wchar_t* pText)
 {

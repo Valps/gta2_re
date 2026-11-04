@@ -71,6 +71,8 @@ class TextTable
 
     EXPORT u16 RemapExtendedChar_5B58D0(u16 ch) const;
 
+    EXPORT u16 RemapExtendedCharToLower_5B58D0(u16 ch) const;
+
     EXPORT void RemapExtendedCharsIfNotJapanese_5B5910(wchar_t* pText);
 
     EXPORT void RemapExtendedChars_5B5930(wchar_t* pStr);
