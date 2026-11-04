@@ -186,7 +186,7 @@ s32 APIENTRY WinMain(HINSTANCE hInstance,
 
     GetGlobalsRegistry()->CheckVars();
 
-    LoadBeginSceneCBPtr();
+    //LoadBeginSceneCBPtr();
     EnableBoot2MapDebugOptions();
 
     WinMain_5E53F0(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
