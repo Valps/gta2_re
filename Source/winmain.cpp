@@ -70,18 +70,16 @@ DEFINE_GLOBAL(u32, gMatchStartTime_6F5A28, 0x6F5A28); // TODO: move
 DEFINE_GLOBAL(u32, gNetworkFrameCounter_6F5868, 0x6F5868); // TODO: move
 DEFINE_GLOBAL(u8, bRecordStartTime_6F593C, 0x6F593C); // TODO: move
 
-//Network_PlayerInputs gAllInputsBuffer[MAX_PLAYERS];
-
 u16 PROTOTYPE_VERSION = 2;
 
 u32 gLocalSimTick = 0; // Last simulated tick (LST)
 u32 gRemoteSimTick[MAX_PLAYERS]; // Last remote simulated tick
 
-s32 gMaxSimulationLeadTicks;
+s32 gMaxSimulationLeadTicks; // how much ticks a player can be ahead of other players in simulation
 
 u32 gDelayedTicks;
-Network_AllInputsBuffer gCurrentNetInputs_6F57D8;
-Network_AllInputsBuffer gPrevNetInputs_6F5B28;
+Network_AllInputsBuffer gCurrentNetInputs_6F57D8; // the buffer
+Network_AllInputsBuffer gPrevNetInputs_6F5B28; // copy used to insert inputs into the game
 Network_AllInputsBuffer gTmpInputBuffer; // used only for shifting arrays
 
 Network_LocalInputsPacket gTmpReceivingInputBuffer;
@@ -90,7 +88,6 @@ Network_LocalInputsPacket gSendingInputBuffer;
 Network_Buffer gInputSendData_6F5B18;
 ReceivedPacket* gpInputBuffer_6F58C0;
 
-u32 gCurrentInputsBufferSize_6F58C4;
 u32 gWaitingBits = 0;
 bool gNextTickInputsPrepared = false;
 
@@ -1036,7 +1033,6 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         memset(byte_6F5AC8, 0, sizeof(byte_6F5AC8));
         gNetworkPlayerIdx_6F56C8 = gNetPlay_7071E8.GetPlayerIdx_409C40();
         gpInputBuffer_6F58C0 = reinterpret_cast<ReceivedPacket*>(&gTmpReceivingInputBuffer);
-        gCurrentInputsBufferSize_6F58C4 = sizeof(Network_PlayerInputs); //0x30;
         dword_6F5B00 = 0;
         bRecordStartTime_6F593C = true;
         gPlayerQuit_6F5AEC = false;
@@ -1143,7 +1139,7 @@ void __stdcall Draw_4DA7B0()
 DEFINE_GLOBAL(Network_PlayerInputs, gNetInputsHistory1_6F56E0, 0x6F56E0);
 DEFINE_GLOBAL(Network_PlayerInputs, gNetInputsHistory2_6F5798, 0x6F5798);
 
-// Re-sends our inputs of a previous frame to one player.
+// Not used anymore
 MATCH_FUNC(0x4DA9B0)
 EXPORT void __stdcall NetSendOldInputs_4DA9B0(Network_InputData* pInputs, s32 delayed_ticks, u8 player_idx)
 {
@@ -1704,7 +1700,7 @@ EXPORT void __stdcall do_network_and_local_inputs_4DAF30()
     }
 }
 
-void CheckPlayersConnections()
+void CheckPlayersConnections() // Disconnect non-responding players after gMaxRetries attempts
 {
     DWORD CurrTime = timeGetTime();
     for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
@@ -1735,6 +1731,10 @@ void CheckPlayersConnections()
 
 void Net_CheckPlayersRNG()
 {
+    if (!bDo_sync_check_67D6C1)
+    {
+        return;
+    }
     // Now check RNG if sync_check is activated. If it doesnt match, then do FatalError
     for (u32 player_idx = 0; player_idx < MAX_PLAYERS; player_idx++)
     {
@@ -1805,13 +1805,13 @@ EXPORT bool RunGameFrame_4DA850()
 
     if (bStartNetworkGame_7081F0)
     {
-        // Re-send packets periodically
+        // Re-send input packets periodically
         if (gNetPlay_7071E8.CountActivePlayers_521350() > 1)
         {
             if (Time - gLastResendTime > gResendInterval)
             {
                 Net_ReSend_Our_Inputs();
-                gNetPlay_7071E8.SendPing_51EF60();
+                gNetPlay_7071E8.SendPing_51EF60(); // Also send ping
                 gLastResendTime = timeGetTime();
             }
         }
@@ -2733,7 +2733,7 @@ s32 __stdcall WinMain_5E53F0(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
             
             if (bStartNetworkGame_7081F0) // Prototype exclusive
             {
-                bDo_sync_check_67D6C1 = true; // TODO: remove these later
+                bDo_sync_check_67D6C1 = true; // always check RNG
                 gShow_cycle_67D6BD = false;
                 bDo_show_timing_67D6DC = false;
             }
