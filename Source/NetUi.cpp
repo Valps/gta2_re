@@ -16,6 +16,7 @@ DEFINE_GLOBAL(s32, gChatLineCount_6F8A2C, 0x6F8A2C);
 EXTERN_GLOBAL_ARRAY(char_type, gTmpBuffer_67C598, 256);
 
 extern bool bNetworkGameStarted;
+extern u16 PROTOTYPE_VERSION;
 
 struct Network_UI_Control_Data_Array
 {
@@ -1556,7 +1557,8 @@ void NetUi::CreateMainUi_51AA90(HWND hWndParent)
         }
     }
 
-    SetWindowTextA(hWndParent, GetString_519A00("netui08")); // "Network GTA2"
+    sprintf(gTmpBuffer_67C598, "GTA2 Network Prototype v0.%d", PROTOTYPE_VERSION);
+    SetWindowTextA(hWndParent, gTmpBuffer_67C598); // GetString_519A00("netui08") = "Network GTA2"
 
     // Subclass to handle enter key pressing
     field_1FD70_old_proc = reinterpret_cast<WNDPROC>(GetWindowLongA(GetDlgItem(hWndParent, TEXTFIELD_CHAT_GUEST_1053), GWL_WNDPROC));
