@@ -20,15 +20,6 @@ class PacketHeader
     s32 field_4_sub_type;
 };
 
-class Packet_Ping
-{
-  public:
-    s32 field_0_sender_player_id;
-    s32 field_4_receiver_player_id;
-    s32 field_8_time;
-};
-GTA2_ASSERT_SIZEOF_ALWAYS(Packet_Ping, 0xC);
-
 class Standard_Packet
 {
   public:

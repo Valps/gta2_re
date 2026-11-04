@@ -27,6 +27,13 @@ struct SyncCheckData
 };
 GTA2_ASSERT_SIZEOF_ALWAYS(SyncCheckData, 0x1F);
 
+class Packet_Ping
+{
+  public:
+    s32 field_0_sender_player_id;
+    s32 field_4_receiver_player_id;
+    s32 field_8_time;
+};
 
 struct SPacket
 {
@@ -82,6 +89,7 @@ union ReceivedPacket
     Network_LocalInputsPacket all_inputs_data;
     SPacket s_packet;
     Network_Buffer net_buffer;
+    Packet_Ping ping;
 };
 #pragma pack(pop)
 

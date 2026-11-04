@@ -1199,7 +1199,7 @@ void Net_Receive_Players_Inputs()
         switch (packet_subtype)
         {
             case packet_subtype::Ping_1:
-                gPlayersPing[player_idx] = timeGetTime() - gLastResendTime;
+                gPlayersPing[player_idx] = abs(timeGetTime() - gpInputBuffer_6F58C0->ping.field_8_time);
                 break;
 
             case packet_subtype::StandardPacket_2:
