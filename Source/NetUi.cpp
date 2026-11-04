@@ -15,6 +15,8 @@ DEFINE_GLOBAL(s32, gChatLineCount_6F8A2C, 0x6F8A2C);
 
 EXTERN_GLOBAL_ARRAY(char_type, gTmpBuffer_67C598, 256);
 
+extern bool bNetworkGameStarted;
+
 struct Network_UI_Control_Data_Array
 {
     Network_UI_Control_Data_Array()
@@ -1618,6 +1620,10 @@ s32 NetUi::Get_20310_showing_window_idx_51ACC0()
 MATCH_FUNC(0x51acd0)
 void NetUi::cb_RemovePlayerFromList_51ACD0(NetUi* pNetUi, wchar_t* Source)
 {
+    if (bNetworkGameStarted) // avoid some weird crash when other player quits the game
+    {
+        return;
+    }
     LVFINDINFOA findInfo;
     char Dest[260];
 

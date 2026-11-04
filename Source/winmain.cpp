@@ -112,6 +112,7 @@ u32 gTickAttempts = 0;
 bool gNetworkStall = false; // Buffer was exhausted and we don't received inputs enough
 
 bool bDrawNetworkDebugInfo = false;
+bool bNetworkGameStarted = false;
 
 DEFINE_GLOBAL_ARRAY(u8, gSyncCheckData_6F58E0, 0x20, 0x6F58E0); // TODO: move
 DEFINE_GLOBAL(u32, gTotalNetworkTime_6F5980, 0x6F5980); // TODO: move
@@ -1077,6 +1078,8 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
         {
             gMaxSimulationLeadTicks = 1;
         }
+
+        bNetworkGameStarted = true;
     }
     else
     {
