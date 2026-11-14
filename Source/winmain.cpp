@@ -100,6 +100,9 @@ u32 gResendInterval = 200;
 
 DWORD gPlayersPing[MAX_PLAYERS]; // Updated every tick
 DWORD gPlayersFreezedPing[MAX_PLAYERS]; // Update once in a while
+DWORD gPingInterval = 1000; // Sent after X miliseconds
+DWORD gLastPingSentTime;
+
 DWORD gPingDrawUpdateTime;
 DWORD gPingTimeToUpdate = 500;
 
@@ -1056,6 +1059,7 @@ EXPORT void __stdcall InitializeGame_4DA4D0()
 
         gLastResendTime = CurrTime;
         gPingDrawUpdateTime = CurrTime;
+        gLastPingSentTime = CurrTime;
 
         for (u32 i = 0; i < MAX_PLAYERS; i++)
         {
@@ -1192,10 +1196,37 @@ void Net_Receive_Players_Inputs()
             break;
         }
 
+        s32 local_player_id;
+
         switch (packet_subtype)
         {
             case packet_subtype::Ping_1:
-                gPlayersPing[player_idx] = abs(timeGetTime() - gpInputBuffer_6F58C0->ping.field_8_time);
+
+                local_player_id = gNetPlay_7071E8.field_5D8_player_id;
+                if (local_player_id == gpInputBuffer_6F58C0->ping.field_0_sender_player_id)
+                {
+                    // Ping returning to sender: compute latency
+                    gPlayersPing[player_idx] = abs(timeGetTime() - gpInputBuffer_6F58C0->ping.field_8_time);
+                }
+                else
+                {
+                    // Ping packet received
+                    Packet_SubType_3 pStru;
+                    s32 pData;
+                    u32 dataLen;
+                    
+                    gpInputBuffer_6F58C0->ping.field_4_receiver_player_id = local_player_id;
+                    memset(&pStru, 0, sizeof(pStru));
+                    pStru.header.field_0_type = 1;
+                    pStru.header.field_4_sub_type = packet_subtype::Ping_1;
+                    pStru.field_9_bLoadData = 1;
+                    pStru.field_8_seq = 0;
+                    pStru.field_D_data = reinterpret_cast<void*>(&gpInputBuffer_6F58C0->ping);
+                    pStru.field_11_len = sizeof(Packet_Ping);
+                    gNetPlay_7071E8.MakeSendData_51F420(&pStru, &pData, &dataLen);
+                    gNetPlay_7071E8.field_5E4_pDPlay3->Send(local_player_id, gpInputBuffer_6F58C0->ping.field_0_sender_player_id, 0, reinterpret_cast<void*>(pData), dataLen);
+                }
+                
                 break;
 
             case packet_subtype::StandardPacket_2:
@@ -1811,8 +1842,13 @@ EXPORT bool RunGameFrame_4DA850()
             if (Time - gLastResendTime > gResendInterval)
             {
                 Net_ReSend_Our_Inputs();
-                gNetPlay_7071E8.SendPing_51EF60(); // Also send ping
                 gLastResendTime = timeGetTime();
+            }
+
+            if (Time - gLastPingSentTime > gPingInterval)
+            {
+                gNetPlay_7071E8.SendPing_51EF60();
+                gLastPingSentTime = timeGetTime();
             }
         }
 
