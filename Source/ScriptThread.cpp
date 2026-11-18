@@ -3459,18 +3459,18 @@ void ScriptThread::SCRCMD_SET_GANG_KILL_REACTION_50AC20()
 MATCH_FUNC(0x50acf0)
 void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
 {
-    SCR_FOUR_PARAMS* pCmd = reinterpret_cast<SCR_FOUR_PARAMS*>(gBasePtr_6F8070);
-    SCR_POINTER* pPointer = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_unsigned_3));
+    SCR_CHANGE_GANG_RESPECT* pCmd = reinterpret_cast<SCR_CHANGE_GANG_RESPECT*>(gBasePtr_6F8070);
+    SCR_POINTER* pPointer = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
 
     // pCmd->field_A_signed_2 = respect parameter
 
-    if ((pCmd->field_A_signed_2 >= 101 && pCmd->field_A_signed_2 <= 104)
-        || (pCmd->field_A_signed_2 >= 111 && pCmd->field_A_signed_2 <= 114))
+    if ((pCmd->field_A_respect >= 101 && pCmd->field_A_respect <= 104)
+        || (pCmd->field_A_respect >= 111 && pCmd->field_A_respect <= 114))
     {
-        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_unsigned_1));
-        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_unsigned_3));
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
         
-        switch (pCmd->field_A_signed_2)
+        switch (pCmd->field_A_respect)
         {
             // Peek
             case 101:
@@ -3500,14 +3500,14 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
                 break;
         }
     } 
-    else if (pCmd->field_A_signed_2 == 120 || pCmd->field_A_signed_2 == 121)
+    else if (pCmd->field_A_respect == 120 || pCmd->field_A_respect == 121)
     {
         // no trigonometry funcs for now
     }
-    else if (pCmd->field_A_signed_2 == 1000) // SCRCMD_GET_CHAR_KILLER
+    else if (pCmd->field_A_respect == 1000) // SCRCMD_GET_CHAR_KILLER
     {
-        SCR_POINTER* pVictim = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_unsigned_1));
-        SCR_POINTER* pKiller = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_unsigned_3));
+        SCR_POINTER* pVictim = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        SCR_POINTER* pKiller = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
         if (pVictim->field_8_char 
             && pVictim->field_8_char->field_204_killer_id != 0
             && pVictim->field_8_char->field_204_killer_id != pVictim->field_8_char->field_200_id) // not killed him self
@@ -3517,6 +3517,42 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
         else
         {
             pKiller->field_8_char = NULL;
+        }
+    }
+    else if (pCmd->field_A_respect == 1001) // ITER_OVER_CHARS  (booleanless version)
+    {
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        //SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+        if (pFirstVar->field_8_char)
+        {
+            if (pFirstVar->field_8_char->mpNext)
+            {
+                pFirstVar->field_8_char = pFirstVar->field_8_char->mpNext;
+            }
+            else
+            {
+                Ped* pFirstPed = gPedPool_6787B8->field_0_pool.GetFirstUsed_4B8FD0();
+                if (pFirstPed)
+                {
+                    pFirstVar->field_8_char = pFirstPed;
+                }
+                else
+                {
+                    pFirstVar->field_8_char = NULL;
+                }
+            }
+        }
+        else
+        {
+            Ped* pFirstPed = gPedPool_6787B8->field_0_pool.GetFirstUsed_4B8FD0();
+            if (pFirstPed)
+            {
+                pFirstVar->field_8_char = pFirstPed;
+            }
+            else
+            {
+                pFirstVar->field_8_char = NULL;
+            }
         }
     }
     else
@@ -3529,21 +3565,21 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
         {
             case SCRCMD_SET_CHAR_RESPECT:
 
-                pGang->SetRespect_4BEE30(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_signed_2));
+                pGang->SetRespect_4BEE30(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_respect));
                 pGang->SetKillAffectsRespect_475900(true);
                 break;
             case SCRCMD_CHANGE_RESPECT:
-                if (pCmd->field_A_signed_2 > 0)
+                if (pCmd->field_A_respect > 0)
                 {
-                    pGang->IncrementRespect_4BEE50(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * (pCmd->field_A_signed_2));
+                    pGang->IncrementRespect_4BEE50(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * (pCmd->field_A_respect));
                 }
                 else
                 {
-                    pGang->DecrementRespect_4BEEA0(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * abs(pCmd->field_A_signed_2));
+                    pGang->DecrementRespect_4BEEA0(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * abs(pCmd->field_A_respect));
                 }
                 break;
             case SCRCMD_CHANGE_GANG_RESP:
-                pGang->ChangeRespectAndUpdate_4BF000(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_signed_2));
+                pGang->ChangeRespectAndUpdate_4BF000(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_respect));
                 break;
         }
     }

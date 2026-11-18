@@ -843,6 +843,13 @@ struct SCR_SET_COUNTER : SCR_CMD_HEADER
     s16 field_A_value;
 };
 
+struct SCR_CHANGE_GANG_RESPECT : SCR_CMD_HEADER
+{
+    u16 field_8_param_1;
+    s16 field_A_respect;
+    u16 field_C_param_2;
+};
+
 namespace SCR_DOOR_OPENTYPES
 {
 enum
