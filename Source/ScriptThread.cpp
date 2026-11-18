@@ -3618,6 +3618,20 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
             }
         }
     }
+    else if (pCmd->field_A_respect == 1005) // SET_CHAR_HEALTH
+    {
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+
+        if (pFirstVar->field_8_char)
+        {
+            pFirstVar->field_8_char->set_health_4039A0(pSecondVar->field_8_counter);
+            if (pSecondVar->field_8_counter == 0)
+            {
+                pFirstVar->field_8_char->Kill_46F9D0();
+            }
+        }
+    }
     else
     {
         // Default code
