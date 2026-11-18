@@ -3522,12 +3522,15 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
     else if (pCmd->field_A_respect == 1001) // ITER_OVER_CHARS  (booleanless version)
     {
         SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
-        //SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+
+        pSecondVar->field_8_counter = 0; // Fail or success
         if (pFirstVar->field_8_char)
         {
             if (pFirstVar->field_8_char->mpNext)
             {
                 pFirstVar->field_8_char = pFirstVar->field_8_char->mpNext;
+                pSecondVar->field_8_counter = 1;
             }
             else
             {
@@ -3535,6 +3538,7 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
                 if (pFirstPed)
                 {
                     pFirstVar->field_8_char = pFirstPed;
+                    pSecondVar->field_8_counter = 1;
                 }
                 else
                 {
@@ -3548,12 +3552,40 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
             if (pFirstPed)
             {
                 pFirstVar->field_8_char = pFirstPed;
+                pSecondVar->field_8_counter = 1;
             }
             else
             {
                 pFirstVar->field_8_char = NULL;
             }
         }
+    }
+    else if (pCmd->field_A_respect == 1002) // ITER_OVER_NPC_CHARS  (booleanless version)
+    {
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+        
+        Ped* pIter;
+        if (pFirstVar->field_8_char)
+        {
+            pIter = pFirstVar->field_8_char->mpNext;
+        }
+        else
+        {
+            pIter = gPedPool_6787B8->field_0_pool.GetFirstUsed_4B8FD0();
+        }
+
+        pSecondVar->field_8_counter = 0; // Fail or success
+
+        for (; pIter; pIter = pIter->mpNext)
+        {
+            if (!pIter->is_player_41B0A0())
+            {
+                pSecondVar->field_8_counter = 1;
+                break;
+            }
+        }
+        pFirstVar->field_8_char = pIter;
     }
     else
     {
