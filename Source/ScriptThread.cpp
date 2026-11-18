@@ -3460,36 +3460,77 @@ MATCH_FUNC(0x50acf0)
 void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
 {
     SCR_FOUR_PARAMS* pCmd = reinterpret_cast<SCR_FOUR_PARAMS*>(gBasePtr_6F8070);
-
-    str_table_entry* pGangStr = gScriptManager_6F8060->FindStringById_503080(gBasePtr_6F8070->field_8_index);
-
-    char_type* gang_name = pGangStr->get_name();
-    Gang* pGang = gGangPool_CA8_67E274->FindGangByName_4BF100(gang_name);
     SCR_POINTER* pPointer = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_unsigned_3));
 
     // pCmd->field_A_signed_2 = respect parameter
 
-    switch (gBasePtr_6F8070->field_2_type)
+    if ((pCmd->field_A_signed_2 >= 101 && pCmd->field_A_signed_2 <= 104)
+        || (pCmd->field_A_signed_2 >= 111 && pCmd->field_A_signed_2 <= 114))
     {
-        case SCRCMD_SET_CHAR_RESPECT:
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_unsigned_1));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_unsigned_3));
+        
+        switch (pCmd->field_A_signed_2)
+        {
+            case 101:
+                pSecondVar->field_8_counter = 0;
+                pSecondVar->field_8_int8 = *(s8*)pFirstVar->field_8_counter;
+                break;
+            case 102:
+                pSecondVar->field_8_counter = 0;
+                pSecondVar->field_8_int16 = *(s16*)pFirstVar->field_8_counter;
+                break;
+            case 104:
+                pSecondVar->field_8_counter = *(s32*)pFirstVar->field_8_counter;
+                break;
 
-            pGang->SetRespect_4BEE30(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_signed_2));
-            pGang->SetKillAffectsRespect_475900(true);
-            break;
-        case SCRCMD_CHANGE_RESPECT:
-            if (pCmd->field_A_signed_2 > 0)
-            {
-                pGang->IncrementRespect_4BEE50(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * (pCmd->field_A_signed_2));
-            }
-            else
-            {
-                pGang->DecrementRespect_4BEEA0(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * abs(pCmd->field_A_signed_2));
-            }
-            break;
-        case SCRCMD_CHANGE_GANG_RESP:
-            pGang->ChangeRespectAndUpdate_4BF000(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_signed_2));
-            break;
+            case 111:
+                *(s8*)pFirstVar->field_8_counter = pSecondVar->field_8_int8;
+                break;
+            case 112:
+                *(s16*)pFirstVar->field_8_counter = pSecondVar->field_8_int16;
+                break;
+            case 114:
+                *(s32*)pFirstVar->field_8_counter = pSecondVar->field_8_counter;
+                break;
+
+            default:
+                break;
+        }
+    } 
+    else if (pCmd->field_A_signed_2 == 120 || pCmd->field_A_signed_2 == 121)
+    {
+        // no trigonometry funcs for now
     }
+    else
+    {
+        // Default code
+        str_table_entry* pGangStr = gScriptManager_6F8060->FindStringById_503080(gBasePtr_6F8070->field_8_index);
+        char_type* gang_name = pGangStr->get_name();
+        Gang* pGang = gGangPool_CA8_67E274->FindGangByName_4BF100(gang_name);
+        switch (gBasePtr_6F8070->field_2_type)
+        {
+            case SCRCMD_SET_CHAR_RESPECT:
+
+                pGang->SetRespect_4BEE30(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_signed_2));
+                pGang->SetKillAffectsRespect_475900(true);
+                break;
+            case SCRCMD_CHANGE_RESPECT:
+                if (pCmd->field_A_signed_2 > 0)
+                {
+                    pGang->IncrementRespect_4BEE50(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * (pCmd->field_A_signed_2));
+                }
+                else
+                {
+                    pGang->DecrementRespect_4BEEA0(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * abs(pCmd->field_A_signed_2));
+                }
+                break;
+            case SCRCMD_CHANGE_GANG_RESP:
+                pGang->ChangeRespectAndUpdate_4BF000(pPointer->field_8_char->field_15C_player->get_idx_4219D0(), 20 * static_cast<u8>(pCmd->field_A_signed_2));
+                break;
+        }
+    }
+    
     ScriptThread::Next_503620(gBasePtr_6F8070);
 }
 

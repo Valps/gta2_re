@@ -146,6 +146,10 @@ struct SCR_POINTER : SCR_CMD_HEADER
         Generator* field_8_generator;
         Hud_Arrow* field_8_arrow;
         AttachedSprite* field_8_sprite;
+        
+        s8 field_8_int8;
+        s16 field_8_int16;
+        s32 field_8_int32;
     };
 };
 
