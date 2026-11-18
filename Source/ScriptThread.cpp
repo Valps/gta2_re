@@ -2626,22 +2626,26 @@ void ScriptThread::SCRCMD_GIVE_WEAPON_5098E0()
     SCR_FOUR_PARAMS* pCmd4 = reinterpret_cast<SCR_FOUR_PARAMS*>(gBasePtr_6F8070);
     SCR_POINTER* pPointer = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(gBasePtr_6F8070->field_8_index));
 
-    if (ScriptThread::GetEntityTypeOfCommand_503410(pPointer->field_2_type) == script_entity_type::char_1)
+    if (pPointer->field_8_char)
     {
-        if (gBasePtr_6F8070->field_2_type == SCRCMD_GIVE_WEAPON1)
+        if (ScriptThread::GetEntityTypeOfCommand_503410(pPointer->field_2_type) == script_entity_type::char_1)
         {
-            pPointer->field_8_char->AddWeaponWithAmmo_45DD30(pCmd->field_A_signed_2, 100);
+            if (gBasePtr_6F8070->field_2_type == SCRCMD_GIVE_WEAPON1)
+            {
+                pPointer->field_8_char->AddWeaponWithAmmo_45DD30(pCmd->field_A_signed_2, 100);
+            }
+            else
+            {
+                pPointer->field_8_char->AddWeaponWithAmmo_45DD30(pCmd4->field_A_signed_2, static_cast<char_type>(pCmd4->field_C_signed_3));
+            }
         }
         else
         {
-            pPointer->field_8_char->AddWeaponWithAmmo_45DD30(pCmd4->field_A_signed_2, static_cast<char_type>(pCmd4->field_C_signed_3));
+            // Always 50 ammo for cars
+            gWeapon_8_707018->allocate_5E3D50(pCmd->field_A_signed_2, 50, pPointer->field_8_car);
         }
     }
-    else
-    {
-        // Always 50 ammo for cars
-        gWeapon_8_707018->allocate_5E3D50(pCmd->field_A_signed_2, 50, pPointer->field_8_car);
-    }
+
     ScriptThread::Next_503620(gBasePtr_6F8070);
 }
 
