@@ -3472,6 +3472,7 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
         
         switch (pCmd->field_A_signed_2)
         {
+            // Peek
             case 101:
                 pSecondVar->field_8_counter = 0;
                 pSecondVar->field_8_int8 = *(s8*)pFirstVar->field_8_counter;
@@ -3483,7 +3484,8 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
             case 104:
                 pSecondVar->field_8_counter = *(s32*)pFirstVar->field_8_counter;
                 break;
-
+            
+            // Poke
             case 111:
                 *(s8*)pFirstVar->field_8_counter = pSecondVar->field_8_int8;
                 break;
@@ -3501,6 +3503,21 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
     else if (pCmd->field_A_signed_2 == 120 || pCmd->field_A_signed_2 == 121)
     {
         // no trigonometry funcs for now
+    }
+    else if (pCmd->field_A_signed_2 == 1000) // SCRCMD_GET_CHAR_KILLER
+    {
+        SCR_POINTER* pVictim = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_unsigned_1));
+        SCR_POINTER* pKiller = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_unsigned_3));
+        if (pVictim->field_8_char 
+            && pVictim->field_8_char->field_204_killer_id != 0
+            && pVictim->field_8_char->field_204_killer_id != pVictim->field_8_char->field_200_id) // not killed him self
+        {
+            pKiller->field_8_char = gPedManager_6787BC->PedById(pVictim->field_8_char->field_204_killer_id);
+        }
+        else
+        {
+            pKiller->field_8_char = NULL;
+        }
     }
     else
     {
