@@ -3670,6 +3670,23 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
             pFirstVar->field_8_char->field_244_remap = static_cast<char_type>(pSecondVar->field_8_counter);
         }
     }
+    else if (pCmd->field_A_respect == 1009) // GIVE_PLAYER_INFINITE_AMMO
+    {
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        //SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+
+        if (pFirstVar->field_8_char != NULL && pFirstVar->field_8_char->is_player_41B0A0())
+        {
+            for (u32 i = 0; i < 28; i++)
+            {
+                if (pFirstVar->field_8_char->field_15C_player->field_718_weapons[i]
+                    && pFirstVar->field_8_char->field_15C_player->field_718_weapons[i]->field_0_ammo != 0)
+                {
+                    pFirstVar->field_8_char->field_15C_player->field_718_weapons[i]->field_0_ammo = 0xFFFF;
+                }
+            }
+        }
+    }
     else
     {
         // Default code
