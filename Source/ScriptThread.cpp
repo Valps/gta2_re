@@ -3510,7 +3510,7 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
         SCR_POINTER* pKiller = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
         if (pVictim->field_8_char 
             && pVictim->field_8_char->field_204_killer_id != 0
-            && pVictim->field_8_char->field_204_killer_id != pVictim->field_8_char->field_200_id) // not killed him self
+            && pVictim->field_8_char->field_204_killer_id != (s32)pVictim->field_8_char->field_200_id) // not killed himself
         {
             pKiller->field_8_char = gPedManager_6787BC->PedById(pVictim->field_8_char->field_204_killer_id);
         }
@@ -3631,6 +3631,13 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
                 pFirstVar->field_8_char->Kill_46F9D0();
             }
         }
+    }
+    else if (pCmd->field_A_respect == 1006) // GET_RANDOM_INT
+    {
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+
+        pFirstVar->field_8_counter = gRng_6F6784.get_int_4F7AE0(pSecondVar->field_8_counter);
     }
     else
     {
