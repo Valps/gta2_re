@@ -3660,6 +3660,16 @@ void ScriptThread::SCRCMD_CHANGE_RESPECT_50ACF0()
             pSecondVar->field_8_counter = 0;
         }
     }
+    else if (pCmd->field_A_respect == 1008) // CHANGE_CHAR_REMAP (with variable remap)
+    {
+        SCR_POINTER* pFirstVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_8_param_1));
+        SCR_POINTER* pSecondVar = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(pCmd->field_C_param_2));
+
+        if (pFirstVar->field_8_char != NULL)
+        {
+            pFirstVar->field_8_char->field_244_remap = static_cast<char_type>(pSecondVar->field_8_counter);
+        }
+    }
     else
     {
         // Default code
