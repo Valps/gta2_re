@@ -95,7 +95,7 @@ class WeaponPool
 
     EXPORT ~WeaponPool();
 
-    Pool<Weapon, 255> field_0_pool;
+    Pool<Weapon, 500> field_0_pool;
 };
 
 EXTERN_GLOBAL(WeaponPool*, gWeapon_30_Pool_707014);
