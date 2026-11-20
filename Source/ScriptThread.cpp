@@ -6827,16 +6827,33 @@ void ScriptThread::SCRCMD_CHECK_CURRENT_WEAPON_510090()
     SCR_CHECK_CURRENT_WEAPON* pCmd = reinterpret_cast<SCR_CHECK_CURRENT_WEAPON*>(gBasePtr_6F8070);
     SCR_POINTER* pPointer = static_cast<SCR_POINTER*>(gScriptManager_6F8060->GetBasePointer_512770(gBasePtr_6F8070->field_8_index));
 
-    Weapon* pWeapon = pPointer->field_8_char->field_15C_player->GetCurrPlayerWeapon_5648F0();
+    Weapon* pWeapon;
 
-    if (pWeapon != NULL && static_cast<u32>(pWeapon->field_1C_weapon_type) == pCmd->field_C_weapon_idx)
+    if (pPointer->field_8_char)
     {
-        field_8_cond_result = true;
+        if (pPointer->field_8_char->is_player_41B0A0())
+        {
+            pWeapon = pPointer->field_8_char->field_15C_player->GetCurrPlayerWeapon_5648F0();
+        }
+        else
+        {
+            pWeapon = pPointer->field_8_char->field_174_pWeapon;
+        }
+
+        if (pWeapon != NULL && static_cast<u32>(pWeapon->field_1C_weapon_type) == pCmd->field_C_weapon_idx)
+        {
+            field_8_cond_result = true;
+        }
+        else
+        {
+            field_8_cond_result = false;
+        }
     }
     else
     {
         field_8_cond_result = false;
     }
+    
     ScriptThread::Next_503620(gBasePtr_6F8070);
 }
 
